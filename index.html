@@ -26,11 +26,31 @@ padding:3vh 5vw;
 font-weight:800;
 }
 
-.top-left{font-size:4.5vh;}
-.clock{font-size:6vh;}
-.weather{font-size:2.2vh;margin-top:1vh;}
-.weather img{height:3vh;vertical-align:middle;}
-.weather-alert{color:#ffeb3b;font-weight:800;animation:blink 1.2s infinite;}
+.top-left{
+font-size:4.5vh;
+}
+
+/* ✅ 時間 + 天氣同一行 */
+.top-right{
+display:flex;
+align-items:center;
+gap:2vw;
+}
+
+.clock{
+font-size:6vh;
+}
+
+.weather{
+font-size:3vh;
+display:flex;
+align-items:center;
+gap:1vw;
+}
+
+.weather img{
+height:3vh;
+}
 
 /* ===== Main Panel ===== */
 .panel{
@@ -55,7 +75,9 @@ color:#777;
 border-bottom:1px solid #ddd;
 }
 
-.row{border-top:1px solid #ddd;}
+.row{
+border-top:1px solid #ddd;
+}
 
 .route-box{
 background:linear-gradient(145deg,#3a3f45,#2a2f34);
@@ -75,14 +97,20 @@ background:linear-gradient(145deg,#ff6b6b,#e53935);
 box-shadow:0 0 20px rgba(255,0,0,0.6);
 }
 
-.next{display:flex;flex-direction:column;gap:1vh;}
-.next-top{font-size:4.5vh;font-weight:800;}
-.next-bottom{font-size:2.5vh;color:#666;}
+.next{
+display:flex;
+flex-direction:column;
+gap:1vh;
+}
 
-/* ✅ 巴士站固定不滾動 */
-.station-wrapper{
-width:100%;
-overflow:hidden;
+.next-top{
+font-size:4.5vh;
+font-weight:800;
+}
+
+.next-bottom{
+font-size:2.5vh;
+color:#666;
 }
 
 .station-name{
@@ -93,9 +121,22 @@ overflow:hidden;
 text-overflow:ellipsis;
 }
 
-.terminal{font-size:3vh;font-weight:700;color:#ff6b6b;}
-.urgent{color:#e53935;animation:blink 1s infinite;}
-@keyframes blink{0%{opacity:1;}50%{opacity:0.4;}100%{opacity:1;}}
+.terminal{
+font-size:3vh;
+font-weight:700;
+color:#ff6b6b;
+}
+
+.urgent{
+color:#e53935;
+animation:blink 1s infinite;
+}
+
+@keyframes blink{
+0%{opacity:1;}
+50%{opacity:0.4;}
+100%{opacity:1;}
+}
 
 .bottombar{
 background:#111;
@@ -112,10 +153,13 @@ font-size:2.5vh;
 
 <div class="topbar">
 <div class="top-left">社畜又要返工 😮‍💨</div>
-<div>
+
+<!-- ✅ 合併成一行 -->
+<div class="top-right">
 <div class="clock" id="clock"></div>
 <div class="weather" id="weather"></div>
 </div>
+
 </div>
 
 <div class="panel">
@@ -139,7 +183,7 @@ const SERVICE_TYPE="1";
 
 const ROUTES=[
 {route:"31B",dest:"發祥街",stopId:"C3672D8D28801773"},
-{route:"38",dest:"興華街",stopId:"C3672D8D28801773"},
+{route:"35A",dest:"興華街",stopId:"C3672D8D28801773"},
 {route:"35A",dest:"興華街",stopId:"A7516C49B99EFD78"},
 {route:"36B",dest:"元州邨",stopId:"C3672D8D28801773"}
 ];
@@ -147,7 +191,7 @@ const ROUTES=[
 let etaData={};
 let stopNames={};
 
-/* ===== 自動全屏 ===== */
+/* ===== 全屏 ===== */
 function enterFullscreen(){
 if(!document.fullscreenElement){
 document.documentElement.requestFullscreen().catch(()=>{});
@@ -155,14 +199,13 @@ document.documentElement.requestFullscreen().catch(()=>{});
 }
 document.body.addEventListener("click",enterFullscreen);
 
-/* ===== 時鐘 ===== */
+/* ✅ 時間格式 hh:mm */
 function updateClock(){
 const now=new Date();
 document.getElementById("clock").innerText=
 now.toLocaleTimeString('zh-HK',{
 hour:'2-digit',
 minute:'2-digit',
-second:'2-digit',
 hour12:false
 });
 document.getElementById("date").innerText=
@@ -174,7 +217,6 @@ if(!t) return "--";
 return Math.max(0,Math.floor((new Date(t)-new Date())/60000));
 }
 
-/* ===== 站名 ===== */
 async function fetchStopName(stopId){
 if(stopNames[stopId]) return;
 try{
@@ -186,7 +228,6 @@ stopNames[stopId]="--";
 }
 }
 
-/* ===== Render ===== */
 function render(){
 const list=document.getElementById("busList");
 list.innerHTML="";
@@ -224,9 +265,7 @@ row.innerHTML=`
 <div class="next-top ${extraClass}">${m1} 分鐘</div>
 <div class="next-bottom">${m2} 分鐘</div>
 </div>
-<div class="station-wrapper">
 <div class="station-name">${station}</div>
-</div>
 <div class="terminal ${extraClass}">${statusText}</div>
 `;
 
@@ -234,7 +273,6 @@ list.appendChild(row);
 });
 }
 
-/* ===== ETA ===== */
 async function fetchETA(){
 await Promise.all(ROUTES.map(async r=>{
 await fetchStopName(r.stopId);
@@ -259,13 +297,11 @@ document.getElementById("lastUpdate").innerText=
 new Date().toLocaleTimeString('zh-HK',{
 hour:'2-digit',
 minute:'2-digit',
-second:'2-digit',
 hour12:false
 });
 render();
 }
 
-/* ===== 天氣 ===== */
 async function fetchWeather(){
 try{
 const res=await fetch("https://data.weather.gov.hk/weatherAPI/opendata/weather.php?dataType=rhrread&lang=tc");
@@ -277,14 +313,13 @@ const iconUrl=iconCode?`https://www.hko.gov.hk/images/HKOWxIconOutline/pic${icon
 
 document.getElementById("weather").innerHTML=`
 ${iconUrl?`<img src="${iconUrl}">`:""}
-${temp}°C ｜ 💧${humidity}%
+${temp}°C | 💧${humidity}%
 `;
 }catch{
-document.getElementById("weather").innerText="天氣讀取失敗";
+document.getElementById("weather").innerText="--";
 }
 }
 
-/* ===== 初始化 ===== */
 updateClock();
 fetchETA();
 fetchWeather();
