@@ -1,157 +1,436 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-HK">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>社畜通勤儀表板</title>
+<title>歸家通勤儀表板</title>
 
 <style>
+:root{
+--bg:#f5f7fb;
+--card:#ffffff;
+--text:#1f2937;
+--muted:#6b7280;
+--line:#e5e7eb;
+--primary:#2563eb;
+--primary-soft:#eff6ff;
+--green:#16a34a;
+--orange:#f97316;
+--red:#dc2626;
+--dark:#111827;
+}
+
+*{
+box-sizing:border-box;
+}
+
 html,body{
 margin:0;
 padding:0;
-height:100%;
-font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial;
-background:#1c1f24;
-color:#fff;
+min-height:100%;
+font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans HK","Microsoft JhengHei",Arial,sans-serif;
+background:var(--bg);
+color:var(--text);
 }
 
 body{
 display:flex;
 flex-direction:column;
-min-height:100vh;
 }
 
+/* ===== Top ===== */
 .topbar{
-background:#ff6b6b;
+background:var(--card);
+border-bottom:1px solid var(--line);
+padding:22px 5vw;
 display:flex;
 justify-content:space-between;
 align-items:center;
-padding:3vh 5vw;
-font-weight:800;
+gap:20px;
+position:sticky;
+top:0;
+z-index:10;
 }
 
-.top-left{font-size:4.5vh;}
-.top-right{display:flex;align-items:center;gap:2vw;}
-.clock{font-size:6vh;}
-.weather{font-size:3vh;display:flex;align-items:center;gap:1vw;}
-.weather img{height:3vh;}
-
-.panel{
-background:#f1f3f6;
-color:#222;
-flex:1;
+.brand{
 display:flex;
 flex-direction:column;
+gap:6px;
 }
 
-.header-row,.row{
-display:grid;
-grid-template-columns:1.3fr 1.8fr 2fr 2fr;
-padding:3vh 5vw;
-align-items:center;
-text-align:center;
-}
-
-.header-row{
-font-size:3vh;
+.title{
+font-size:28px;
 font-weight:800;
-color:#777;
-border-bottom:1px solid #ddd;
+letter-spacing:.02em;
 }
 
-#busList{flex:1;}
-.row{border-top:1px solid #ddd;}
+.subtitle{
+font-size:15px;
+color:var(--muted);
+}
 
-.route-box{
-background:linear-gradient(145deg,#3a3f45,#2a2f34);
-color:#fff;
-font-size:8vh;
-font-weight:900;
+.top-info{
 display:flex;
-justify-content:center;
 align-items:center;
+gap:18px;
+flex-wrap:wrap;
+justify-content:flex-end;
+}
+
+.clock{
+font-size:34px;
+font-weight:800;
+font-variant-numeric:tabular-nums;
+color:var(--dark);
+}
+
+.weather{
+background:var(--primary-soft);
+color:var(--primary);
+border-radius:999px;
+padding:8px 14px;
+font-size:15px;
+font-weight:700;
+display:flex;
+align-items:center;
+gap:8px;
+white-space:nowrap;
+}
+
+.weather img{
+width:24px;
+height:24px;
+}
+
+/* ===== Main ===== */
+.main{
+width:100%;
+max-width:1180px;
+margin:0 auto;
+padding:28px 5vw 90px;
+flex:1;
+}
+
+.summary{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:16px;
+margin-bottom:22px;
+}
+
+.summary-card{
+background:var(--card);
+border:1px solid var(--line);
 border-radius:18px;
-height:12vh;
-box-shadow:0 4px 12px rgba(0,0,0,0.25);
+padding:20px;
+box-shadow:0 8px 24px rgba(15,23,42,.04);
 }
 
-.route-box.urgent-box{
-background:linear-gradient(145deg,#ff6b6b,#e53935);
-box-shadow:0 0 20px rgba(255,0,0,0.6);
+.summary-label{
+font-size:14px;
+color:var(--muted);
+margin-bottom:8px;
 }
 
-.next{display:flex;flex-direction:column;gap:1vh;}
-.next-top{font-size:4.5vh;font-weight:800;}
-.next-bottom{font-size:2.5vh;color:#666;}
+.summary-value{
+font-size:24px;
+font-weight:800;
+}
+
+/* ===== Section ===== */
+.section-title{
+display:flex;
+justify-content:space-between;
+align-items:flex-end;
+gap:16px;
+margin:26px 0 14px;
+}
+
+.section-title h2{
+margin:0;
+font-size:22px;
+}
+
+.section-title .hint{
+font-size:14px;
+color:var(--muted);
+}
+
+/* ===== Bus List ===== */
+.bus-list{
+display:grid;
+grid-template-columns:1fr;
+gap:12px;
+}
+
+.bus-card{
+background:var(--card);
+border:1px solid var(--line);
+border-radius:18px;
+padding:18px 20px;
+display:grid;
+grid-template-columns:110px 1.1fr 1.4fr 1fr;
+gap:18px;
+align-items:center;
+box-shadow:0 8px 24px rgba(15,23,42,.04);
+}
+
+.route{
+height:64px;
+border-radius:14px;
+background:var(--dark);
+color:#fff;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:30px;
+font-weight:900;
+letter-spacing:.02em;
+}
+
+.route.soon{
+background:var(--red);
+}
+
+.eta-main{
+display:flex;
+flex-direction:column;
+gap:4px;
+}
+
+.eta-label{
+font-size:13px;
+color:var(--muted);
+}
+
+.eta-time{
+font-size:32px;
+font-weight:900;
+font-variant-numeric:tabular-nums;
+}
+
+.eta-time.red{
+color:var(--red);
+}
+
+.eta-time.orange{
+color:var(--orange);
+}
+
+.eta-time.green{
+color:var(--green);
+}
+
+.eta-next{
+font-size:14px;
+color:var(--muted);
+}
+
+.station{
+min-width:0;
+}
+
+.station-label{
+font-size:13px;
+color:var(--muted);
+margin-bottom:5px;
+}
 
 .station-name{
-font-size:3vh;
-font-weight:600;
+font-size:18px;
+font-weight:700;
 white-space:nowrap;
 overflow:hidden;
 text-overflow:ellipsis;
 }
 
-.status-text{
-font-size:3vh;
+.home-status{
+justify-self:end;
+text-align:right;
+}
+
+.status-pill{
+display:inline-flex;
+align-items:center;
+justify-content:center;
+border-radius:999px;
+padding:9px 14px;
+font-size:15px;
+font-weight:800;
+white-space:nowrap;
+}
+
+.status-pill.red{
+background:#fef2f2;
+color:var(--red);
+}
+
+.status-pill.orange{
+background:#fff7ed;
+color:var(--orange);
+}
+
+.status-pill.green{
+background:#f0fdf4;
+color:var(--green);
+}
+
+.status-pill.gray{
+background:#f3f4f6;
+color:var(--muted);
+}
+
+/* ===== Footer ===== */
+.bottombar{
+position:fixed;
+left:0;
+right:0;
+bottom:0;
+background:rgba(255,255,255,.92);
+backdrop-filter:blur(10px);
+border-top:1px solid var(--line);
+padding:12px 5vw;
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:12px;
+font-size:14px;
+color:var(--muted);
+z-index:20;
+}
+
+.footer-strong{
+color:var(--text);
 font-weight:700;
 }
 
-.urgent{
-color:#e53935;
-animation:blink 1s infinite;
+/* ===== Empty / Loading ===== */
+.empty{
+background:var(--card);
+border:1px dashed var(--line);
+border-radius:18px;
+padding:28px;
+text-align:center;
+color:var(--muted);
 }
 
-.relax{
-color:#2e7d32;
+/* ===== Responsive ===== */
+@media(max-width:850px){
+.topbar{
+align-items:flex-start;
+flex-direction:column;
 }
 
-@keyframes blink{
-0%{opacity:1;}
-50%{opacity:0.4;}
-100%{opacity:1;}
+.top-info{
+width:100%;
+justify-content:space-between;
+}
+
+.summary{
+grid-template-columns:1fr;
+}
+
+.bus-card{
+grid-template-columns:88px 1fr;
+grid-template-areas:
+"route eta"
+"station station"
+"status status";
+}
+
+.route{
+grid-area:route;
+height:58px;
+font-size:26px;
+}
+
+.eta-main{
+grid-area:eta;
+}
+
+.station{
+grid-area:station;
+}
+
+.home-status{
+grid-area:status;
+justify-self:start;
+text-align:left;
+}
+
+.clock{
+font-size:30px;
+}
+
+.title{
+font-size:24px;
 }
 
 .bottombar{
-background:#111;
-color:#ff6b6b;
-display:flex;
-justify-content:space-between;
-padding:2vh 5vw;
-font-size:2.5vh;
+font-size:12px;
+flex-wrap:wrap;
+}
 }
 </style>
 </head>
 
 <body>
 
-<div class="topbar">
-<div class="top-left">社畜又要返工 😮‍💨</div>
-<div class="top-right">
-<div class="clock" id="clock"></div>
-<div class="weather" id="weather"></div>
-</div>
+<header class="topbar">
+<div class="brand">
+<div class="title">歸家通勤儀表板</div>
+<div class="subtitle">放工了，看看哪班車帶你回家</div>
 </div>
 
-<div class="panel">
-<div class="header-row">
-<div>路線</div>
-<div>到站時間</div>
-<div>巴士站</div>
-<div>今日心情</div>
+<div class="top-info">
+<div class="clock" id="clock">--:--:--</div>
+<div class="weather" id="weather">天氣載入中</div>
 </div>
-<div id="busList"></div>
+</header>
+
+<main class="main">
+
+<section class="summary">
+<div class="summary-card">
+<div class="summary-label">今日目標</div>
+<div class="summary-value">平安回家</div>
 </div>
 
-<div class="bottombar">
-<div>精神狀態：低落 ☕</div>
-<div id="date"></div>
-<div>最後更新時間 <span id="lastUpdate"></span></div>
+<div class="summary-card">
+<div class="summary-label">目前狀態</div>
+<div class="summary-value" id="overallStatus">準備出發</div>
 </div>
+
+<div class="summary-card">
+<div class="summary-label">日期</div>
+<div class="summary-value" id="date">--</div>
+</div>
+</section>
+
+<div class="section-title">
+<h2>回家巴士</h2>
+<div class="hint">自動更新到站時間</div>
+</div>
+
+<section id="busList" class="bus-list">
+<div class="empty">正在載入巴士到站資訊...</div>
+</section>
+
+</main>
+
+<footer class="bottombar">
+<div>下一站：<span class="footer-strong">屋企</span></div>
+<div>最後更新：<span class="footer-strong" id="lastUpdate">--</span></div>
+<div>資料來源：KMB / HKO</div>
+</footer>
 
 <script>
 const SERVICE_TYPE="1";
 
+/*
+  ✅ 之後想加入更多巴士，只需要在這裡加：
+  {route:"路線",stopId:"巴士站ID"}
+*/
 const ROUTES=[
 {route:"31B",stopId:"C3672D8D28801773"},
 {route:"35A",stopId:"C3672D8D28801773"},
@@ -163,41 +442,97 @@ let stopNames={};
 
 function updateClock(){
 const now=new Date();
+
 document.getElementById("clock").innerText=
-now.toLocaleTimeString('zh-HK',{
-hour:'2-digit',
-minute:'2-digit',
-second:'2-digit',
+now.toLocaleTimeString("zh-HK",{
+hour:"2-digit",
+minute:"2-digit",
+second:"2-digit",
 hour12:false
 });
+
 document.getElementById("date").innerText=
-now.toLocaleDateString('zh-HK',{weekday:'short',day:'2-digit',month:'short'});
+now.toLocaleDateString("zh-HK",{
+weekday:"short",
+month:"short",
+day:"2-digit"
+});
 }
 
 function getMinutes(t){
 if(!t) return "--";
+
 const diff=new Date(t)-new Date();
+
 if(isNaN(diff)) return "--";
+
 return Math.max(0,Math.floor(diff/60000));
 }
 
-/* ✅ 搞笑文字邏輯 */
-function getFunnyStatus(m){
-if(m==="--") return {text:"擺爛中 🫠",class:""};
+function getEtaClass(m){
+if(m==="--") return "";
+if(m<=3) return "red";
+if(m<=8) return "orange";
+return "green";
+}
 
-if(m<=1) return {text:"衝啊！！會遲到啦 🏃‍♂️💨",class:"urgent"};
-if(m<=3) return {text:"仲唔跑等咩 😡",class:"urgent"};
-if(m<=8) return {text:"可以慢慢行 😌",class:"relax"};
-if(m<=15) return {text:"仲可以買早餐 🥐",class:"relax"};
+function getHomeStatus(m){
+if(m==="--"){
+return {text:"等車資訊未明",class:"gray"};
+}
 
-return {text:"人生仲有希望 ✨",class:"relax"};
+if(m<=1){
+return {text:"即將開走，快啲行",class:"red"};
+}
+
+if(m<=3){
+return {text:"要準備落樓",class:"red"};
+}
+
+if(m<=8){
+return {text:"時間剛剛好",class:"orange"};
+}
+
+if(m<=15){
+return {text:"可以慢慢收拾",class:"green"};
+}
+
+return {text:"仲有時間休息",class:"green"};
+}
+
+function updateOverallStatus(){
+let mins=[];
+
+Object.values(etaData).forEach(list=>{
+if(list && list[0]){
+const m=getMinutes(list[0]);
+if(m!=="--") mins.push(m);
+}
+});
+
+if(mins.length===0){
+document.getElementById("overallStatus").innerText="等待資料";
+return;
+}
+
+const soonest=Math.min(...mins);
+
+if(soonest<=3){
+document.getElementById("overallStatus").innerText="準備出門";
+}else if(soonest<=8){
+document.getElementById("overallStatus").innerText="時間剛好";
+}else{
+document.getElementById("overallStatus").innerText="可以慢慢嚟";
+}
 }
 
 async function fetchStopName(stopId){
 if(stopNames[stopId]) return;
+
 try{
 const res=await fetch(`https://data.etabus.gov.hk/v1/transport/kmb/stop/${stopId}`);
 const data=await res.json();
+
 stopNames[stopId]=data?.data?.name_tc || "--";
 }catch{
 stopNames[stopId]="--";
@@ -208,43 +543,69 @@ function render(){
 const list=document.getElementById("busList");
 list.innerHTML="";
 
+if(ROUTES.length===0){
+list.innerHTML=`<div class="empty">尚未加入任何回家巴士路線</div>`;
+return;
+}
+
 ROUTES.forEach(r=>{
 const key=r.route+"_"+r.stopId;
 const etas=etaData[key]||[];
+
 const m1=getMinutes(etas[0]);
 const m2=getMinutes(etas[1]);
 
-let boxClass="route-box";
-if(m1<=1 && m1!=="--") boxClass+=" urgent-box";
-
+const etaClass=getEtaClass(m1);
+const status=getHomeStatus(m1);
 const station=stopNames[r.stopId]||"--";
-const status=getFunnyStatus(m1);
 
-const row=document.createElement("div");
-row.className="row";
+const card=document.createElement("article");
+card.className="bus-card";
 
-row.innerHTML=`
-<div class="${boxClass}">${r.route}</div>
-<div class="next">
-<div class="next-top">${m1} 分鐘</div>
-<div class="next-bottom">${m2} 分鐘</div>
+card.innerHTML=`
+<div class="route ${m1 !== "--" && m1 <= 3 ? "soon" : ""}">
+${r.route}
 </div>
+
+<div class="eta-main">
+<div class="eta-label">下一班</div>
+<div class="eta-time ${etaClass}">
+${m1 === "--" ? "--" : m1} 分鐘
+</div>
+<div class="eta-next">
+再下一班：${m2 === "--" ? "--" : m2 + " 分鐘"}
+</div>
+</div>
+
+<div class="station">
+<div class="station-label">上車站</div>
 <div class="station-name">${station}</div>
-<div class="status-text ${status.class}">${status.text}</div>
+</div>
+
+<div class="home-status">
+<span class="status-pill ${status.class}">
+${status.text}
+</span>
+</div>
 `;
 
-list.appendChild(row);
+list.appendChild(card);
 });
+
+updateOverallStatus();
 }
 
 async function fetchETA(){
 await Promise.all(ROUTES.map(async r=>{
 await fetchStopName(r.stopId);
+
 const key=r.route+"_"+r.stopId;
+
 try{
 const res=await fetch(
 `https://data.etabus.gov.hk/v1/transport/kmb/eta/${r.stopId}/${r.route}/${SERVICE_TYPE}`
 );
+
 const data=await res.json();
 
 if(data?.data && data.data.length>0){
@@ -259,10 +620,10 @@ etaData[key]=[];
 }));
 
 document.getElementById("lastUpdate").innerText=
-new Date().toLocaleTimeString('zh-HK',{
-hour:'2-digit',
-minute:'2-digit',
-second:'2-digit',
+new Date().toLocaleTimeString("zh-HK",{
+hour:"2-digit",
+minute:"2-digit",
+second:"2-digit",
 hour12:false
 });
 
@@ -273,17 +634,22 @@ async function fetchWeather(){
 try{
 const res=await fetch("https://data.weather.gov.hk/weatherAPI/opendata/weather.php?dataType=rhrread&lang=tc");
 const data=await res.json();
+
 const temp=data?.temperature?.data?.[0]?.value ?? "--";
 const humidity=data?.humidity?.data?.[0]?.value ?? "--";
 const iconCode=data?.icon?.[0];
-const iconUrl=iconCode?`https://www.hko.gov.hk/images/HKOWxIconOutline/pic${iconCode}.png`:"";
+
+const iconUrl=iconCode
+?`https://www.hko.gov.hk/images/HKOWxIconOutline/pic${iconCode}.png`
+:"";
 
 document.getElementById("weather").innerHTML=`
-${iconUrl?`<img src="${iconUrl}">`:""}
-${temp}°C | 💧${humidity}%
+${iconUrl?`<img src="${iconUrl}" alt="weather icon">`:""}
+<span>${temp}°C</span>
+<span>💧${humidity}%</span>
 `;
 }catch{
-document.getElementById("weather").innerText="--";
+document.getElementById("weather").innerText="天氣未能載入";
 }
 }
 
