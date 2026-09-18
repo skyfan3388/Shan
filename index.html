@@ -1,616 +1,1677 @@
 <!DOCTYPE html>
-<html lang="zh-HK">
+<html lang="zh-Hant-HK">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>歸家通勤儀表板</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cash2Joy 精選貨物展示</title>
+  <meta name="description" content="Cash2Joy 精選貨物展示，瀏覽收藏卡、潮流玩具、遊戲精品及生活好物，直接 WhatsApp 查詢。" />
 
-<style>
-:root{
---bg:#f5f7fb;
---card:#ffffff;
---text:#1f2937;
---muted:#6b7280;
---line:#e5e7eb;
---primary:#2563eb;
---primary-soft:#eff6ff;
---green:#16a34a;
---orange:#f97316;
---red:#dc2626;
---dark:#111827;
-}
+  <style>
+    :root {
+      --primary: #7c3aed;
+      --primary-dark: #5b21b6;
+      -- pink: #ec4899;
+      --pink: #ec4899;
+      --sky: #38bdf8;
+      --green: #22c55e;
+      --green-dark: #16a34a;
+      --yellow: #facc15;
+      --black: #111827;
+      --gray: #6b7280;
+      --light-gray: #f3f4f6;
+      --white: #ffffff;
+      --card: #ffffff;
+      --border: #e5e7eb;
+      --shadow: 0 12px 30px rgba(17, 24, 39, 0.1);
+      --radius: 22px;
+      --container: 1180px;
+    }
 
-*{
-box-sizing:border-box;
-}
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-html,body{
-margin:0;
-padding:0;
-min-height:100%;
-font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans HK","Microsoft JhengHei",Arial,sans-serif;
-background:var(--bg);
-color:var(--text);
-}
+    html {
+      scroll-behavior: smooth;
+    }
 
-body{
-display:flex;
-flex-direction:column;
-}
+    body {
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        "Noto Sans TC",
+        "Microsoft JhengHei",
+        Arial,
+        sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(124, 58, 237, 0.14), transparent 28%),
+        radial-gradient(circle at top right, rgba(236, 72, 153, 0.12), transparent 28%),
+        linear-gradient(180deg, #ffffff 0%, #f8fafc 45%, #ffffff 100%);
+      color: var(--black);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
 
-/* ===== Top ===== */
-.topbar{
-background:var(--card);
-border-bottom:1px solid var(--line);
-padding:18px 5vw;
-display:flex;
-justify-content:space-between;
-align-items:center;
-gap:20px;
-position:sticky;
-top:0;
-z-index:10;
-}
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
 
-.brand{
-display:flex;
-flex-direction:column;
-gap:4px;
-}
+    img {
+      max-width: 100%;
+      display: block;
+    }
 
-.title{
-font-size:26px;
-font-weight:800;
-letter-spacing:.02em;
-}
+    button,
+    a {
+      -webkit-tap-highlight-color: transparent;
+    }
 
-.subtitle{
-font-size:14px;
-color:var(--muted);
-}
+    .container {
+      width: min(100% - 32px, var(--container));
+      margin: 0 auto;
+    }
 
-.top-info{
-display:flex;
-align-items:center;
-gap:12px;
-flex-wrap:wrap;
-justify-content:flex-end;
-}
+    .section {
+      padding: 88px 0;
+      scroll-margin-top: 90px;
+    }
 
-.info-pill{
-background:var(--primary-soft);
-color:var(--primary);
-border-radius:999px;
-padding:7px 12px;
-font-size:14px;
-font-weight:700;
-display:flex;
-align-items:center;
-gap:6px;
-white-space:nowrap;
-}
+    .section-header {
+      text-align: center;
+      margin-bottom: 42px;
+    }
 
-.clock{
-font-size:30px;
-font-weight:800;
-font-variant-numeric:tabular-nums;
-color:var(--dark);
-}
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 14px;
+      border-radius: 999px;
+      background: rgba(124, 58, 237, 0.1);
+      color: var(--primary-dark);
+      font-size: 14px;
+      font-weight: 800;
+      margin-bottom: 14px;
+    }
 
-.weather img{
-width:22px;
-height:22px;
-}
+    .section-title {
+      font-size: clamp(30px, 4vw, 46px);
+      line-height: 1.15;
+      letter-spacing: -0.04em;
+      margin-bottom: 14px;
+    }
 
-/* ===== Main ===== */
-.main{
-width:100%;
-max-width:1180px;
-margin:0 auto;
-padding:22px 5vw 78px;
-flex:1;
-}
+    .section-desc {
+      max-width: 720px;
+      margin: 0 auto;
+      color: var(--gray);
+      font-size: 17px;
+    }
 
-/* ===== Section ===== */
-.section-title{
-display:flex;
-justify-content:space-between;
-align-items:flex-end;
-gap:16px;
-margin:4px 0 12px;
-}
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      min-height: 46px;
+      padding: 12px 20px;
+      border: 0;
+      border-radius: 999px;
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+      white-space: nowrap;
+    }
 
-.section-title h2{
-margin:0;
-font-size:20px;
-}
+    .btn:hover {
+      transform: translateY(-2px);
+    }
 
-.section-title .hint{
-font-size:13px;
-color:var(--muted);
-}
+    .btn-primary {
+      color: var(--white);
+      background: linear-gradient(135deg, var(--primary), var(--pink));
+      box-shadow: 0 12px 24px rgba(124, 58, 237, 0.26);
+    }
 
-/* ===== Bus List ===== */
-.bus-list{
-display:grid;
-grid-template-columns:1fr;
-gap:8px;
-}
+    .btn-primary:hover {
+      box-shadow: 0 16px 28px rgba(124, 58, 237, 0.34);
+    }
 
-.bus-card{
-background:var(--card);
-border:1px solid var(--line);
-border-radius:14px;
-padding:12px 14px;
-display:grid;
-grid-template-columns:82px 1fr 1.4fr 1fr;
-gap:12px;
-align-items:center;
-box-shadow:0 4px 14px rgba(15,23,42,.035);
-}
+    .btn-whatsapp {
+      color: var(--white);
+      background: linear-gradient(135deg, var(--green), var(--green-dark));
+      box-shadow: 0 12px 24px rgba(34, 197, 94, 0.25);
+    }
 
-.route{
-height:48px;
-border-radius:11px;
-background:var(--dark);
-color:#fff;
-display:flex;
-align-items:center;
-justify-content:center;
-font-size:24px;
-font-weight:900;
-letter-spacing:.02em;
-}
+    .btn-whatsapp:hover {
+      box-shadow: 0 16px 28px rgba(34, 197, 94, 0.34);
+    }
 
-.route.soon{
-background:var(--red);
-}
+    .btn-outline {
+      background: var(--white);
+      color: var(--black);
+      border: 1px solid var(--border);
+    }
 
-.eta-main{
-display:flex;
-flex-direction:column;
-gap:2px;
-}
+    .btn-outline:hover {
+      border-color: rgba(124, 58, 237, 0.35);
+      box-shadow: 0 10px 22px rgba(17, 24, 39, 0.08);
+    }
 
-.eta-label{
-font-size:12px;
-color:var(--muted);
-}
+    /* Header */
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(255, 255, 255, 0.82);
+      backdrop-filter: blur(18px);
+      border-bottom: 1px solid rgba(229, 231, 235, 0.7);
+    }
 
-.eta-time{
-font-size:25px;
-font-weight:900;
-font-variant-numeric:tabular-nums;
-line-height:1.1;
-}
+    .nav {
+      min-height: 74px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
 
-.eta-time.red{
-color:var(--red);
-}
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 950;
+      letter-spacing: -0.03em;
+      font-size: 22px;
+    }
 
-.eta-time.orange{
-color:var(--orange);
-}
+    .logo-mark {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border-radius: 15px;
+      color: white;
+      background:
+        linear-gradient(135deg, var(--primary), var(--pink) 55%, var(--sky));
+      box-shadow: 0 10px 24px rgba(124, 58, 237, 0.24);
+      font-size: 20px;
+      transform: rotate(-3deg);
+    }
 
-.eta-time.green{
-color:var(--green);
-}
+    .brand span:last-child {
+      background: linear-gradient(135deg, var(--primary-dark), var(--pink));
+      -webkit-background-clip: text;
+      color: transparent;
+    }
 
-.eta-next{
-font-size:13px;
-color:var(--muted);
-}
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
 
-.station{
-min-width:0;
-}
+    .nav-links a {
+      padding: 10px 14px;
+      border-radius: 999px;
+      color: #374151;
+      font-weight: 800;
+      font-size: 15px;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
 
-.station-label{
-font-size:12px;
-color:var(--muted);
-margin-bottom:3px;
-}
+    .nav-links a:hover {
+      background: rgba(124, 58, 237, 0.09);
+      color: var(--primary-dark);
+    }
 
-.station-name{
-font-size:16px;
-font-weight:700;
-white-space:nowrap;
-overflow:hidden;
-text-overflow:ellipsis;
-}
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
 
-.home-status{
-justify-self:end;
-text-align:right;
-}
+    .menu-toggle {
+      display: none;
+      width: 46px;
+      height: 46px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: var(--white);
+      cursor: pointer;
+    }
 
-.status-pill{
-display:inline-flex;
-align-items:center;
-justify-content:center;
-border-radius:999px;
-padding:7px 11px;
-font-size:13px;
-font-weight:800;
-white-space:nowrap;
-}
+    .menu-lines {
+      width: 20px;
+      margin: 0 auto;
+      display: grid;
+      gap: 5px;
+    }
 
-.status-pill.red{
-background:#fef2f2;
-color:var(--red);
-}
+    .menu-lines span {
+      display: block;
+      height: 2px;
+      background: var(--black);
+      border-radius: 999px;
+    }
 
-.status-pill.orange{
-background:#fff7ed;
-color:var(--orange);
-}
+    .mobile-menu {
+      display: none;
+      padding: 0 0 16px;
+    }
 
-.status-pill.green{
-background:#f0fdf4;
-color:var(--green);
-}
+    .mobile-menu.open {
+      display: block;
+    }
 
-.status-pill.gray{
-background:#f3f4f6;
-color:var(--muted);
-}
+    .mobile-menu-inner {
+      display: grid;
+      gap: 8px;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: var(--white);
+      box-shadow: var(--shadow);
+    }
 
-/* ===== Footer ===== */
-.bottombar{
-position:fixed;
-left:0;
-right:0;
-bottom:0;
-background:rgba(255,255,255,.92);
-backdrop-filter:blur(10px);
-border-top:1px solid var(--line);
-padding:10px 5vw;
-display:flex;
-justify-content:space-between;
-align-items:center;
-gap:12px;
-font-size:13px;
-color:var(--muted);
-z-index:20;
-}
+    .mobile-menu a {
+      padding: 13px 14px;
+      border-radius: 14px;
+      font-weight: 800;
+      color: #374151;
+    }
 
-.footer-strong{
-color:var(--text);
-font-weight:700;
-}
+    .mobile-menu a:hover {
+      background: var(--light-gray);
+    }
 
-/* ===== Empty / Loading ===== */
-.empty{
-background:var(--card);
-border:1px dashed var(--line);
-border-radius:14px;
-padding:22px;
-text-align:center;
-color:var(--muted);
-font-size:14px;
-}
+    /* Hero */
+    .hero {
+      position: relative;
+      padding: 88px 0 70px;
+      overflow: hidden;
+    }
 
-/* ===== Responsive ===== */
-@media(max-width:850px){
-.topbar{
-align-items:flex-start;
-flex-direction:column;
-padding:16px 5vw;
-}
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.08fr 0.92fr;
+      align-items: center;
+      gap: 42px;
+    }
 
-.top-info{
-width:100%;
-justify-content:flex-start;
-gap:8px;
-}
+    .hero h1 {
+      font-size: clamp(40px, 6vw, 72px);
+      line-height: 1.05;
+      letter-spacing: -0.06em;
+      margin-bottom: 20px;
+    }
 
-.clock{
-font-size:28px;
-}
+    .gradient-text {
+      background: linear-gradient(135deg, var(--primary), var(--pink), var(--sky));
+      -webkit-background-clip: text;
+      color: transparent;
+    }
 
-.title{
-font-size:23px;
-}
+    .hero p {
+      color: #4b5563;
+      font-size: clamp(17px, 2vw, 21px);
+      max-width: 650px;
+      margin-bottom: 28px;
+    }
 
-.subtitle{
-font-size:13px;
-}
+    .hero-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 26px;
+    }
 
-.main{
-padding-top:18px;
-}
+    .hero-points {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
 
-.bus-card{
-grid-template-columns:70px 1fr;
-grid-template-areas:
-"route eta"
-"station station"
-"status status";
-padding:11px;
-gap:9px;
-}
+    .point {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid var(--border);
+      color: #374151;
+      font-size: 14px;
+      font-weight: 800;
+    }
 
-.route{
-grid-area:route;
-height:44px;
-font-size:22px;
-}
+    .hero-card-wrap {
+      position: relative;
+      min-height: 440px;
+    }
 
-.eta-main{
-grid-area:eta;
-}
+    .blob {
+      position: absolute;
+      inset: 40px 20px 20px 20px;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(250, 204, 21, 0.65), transparent 28%),
+        radial-gradient(circle at 82% 24%, rgba(56, 189, 248, 0.55), transparent 30%),
+        linear-gradient(135deg, rgba(124, 58, 237, 0.85), rgba(236, 72, 153, 0.82));
+      border-radius: 38% 62% 44% 56% / 54% 40% 60% 46%;
+      filter: blur(0);
+      opacity: 0.92;
+      animation: floatBlob 7s ease-in-out infinite;
+    }
 
-.eta-time{
-font-size:23px;
-}
+    @keyframes floatBlob {
+      0%, 100% {
+        transform: translateY(0) rotate(0deg);
+      }
+      50% {
+        transform: translateY(-14px) rotate(3deg);
+      }
+    }
 
-.station{
-grid-area:station;
-}
+    .showcase-card {
+      position: relative;
+      margin: 38px auto 0;
+      width: min(100%, 410px);
+      padding: 22px;
+      border-radius: 32px;
+      background: rgba(255, 255, 255, 0.84);
+      backdrop-filter: blur(16px);
+      box-shadow: 0 26px 60px rgba(17, 24, 39, 0.18);
+      border: 1px solid rgba(255,255,255,0.8);
+    }
 
-.home-status{
-grid-area:status;
-justify-self:start;
-text-align:left;
-}
+    .showcase-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+    }
 
-.bottombar{
-font-size:12px;
-flex-wrap:wrap;
-}
-}
-</style>
+    .badge-hot {
+      padding: 7px 12px;
+      border-radius: 999px;
+      color: white;
+      background: linear-gradient(135deg, var(--pink), var(--primary));
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .mini-price {
+      color: var(--primary-dark);
+      font-weight: 950;
+      font-size: 20px;
+    }
+
+    .hero-product-art {
+      height: 240px;
+      border-radius: 26px;
+      display: grid;
+      place-items: center;
+      background:
+        linear-gradient(135deg, rgba(124, 58, 237, 0.12), rgba(236, 72, 153, 0.1)),
+        #f8fafc;
+      border: 1px solid var(--border);
+      margin-bottom: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-product-art::before,
+    .hero-product-art::after {
+      content: "";
+      position: absolute;
+      border-radius: 999px;
+      filter: blur(1px);
+      opacity: 0.75;
+    }
+
+    .hero-product-art::before {
+      width: 140px;
+      height: 140px;
+      background: rgba(56, 189, 248, 0.28);
+      top: -28px;
+      right: -24px;
+    }
+
+    .hero-product-art::after {
+      width: 130px;
+      height: 130px;
+      background: rgba(236, 72, 153, 0.22);
+      bottom: -30px;
+      left: -20px;
+    }
+
+    .big-icon {
+      position: relative;
+      z-index: 1;
+      font-size: 98px;
+      filter: drop-shadow(0 14px 14px rgba(17, 24, 39, 0.14));
+    }
+
+    .showcase-card h3 {
+      font-size: 22px;
+      letter-spacing: -0.02em;
+      margin-bottom: 6px;
+    }
+
+    .showcase-card p {
+      font-size: 15px;
+      color: var(--gray);
+      margin: 0;
+    }
+
+    /* Categories */
+    .categories-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+    }
+
+    .category-card {
+      position: relative;
+      padding: 26px 20px;
+      border-radius: var(--radius);
+      background: var(--white);
+      border: 1px solid var(--border);
+      box-shadow: 0 12px 26px rgba(17, 24, 39, 0.06);
+      overflow: hidden;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .category-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow);
+    }
+
+    .category-card::after {
+      content: "";
+      position: absolute;
+      width: 120px;
+      height: 120px;
+      border-radius: 999px;
+      right: -46px;
+      top: -46px;
+      opacity: 0.15;
+      background: var(--accent);
+    }
+
+    .category-icon {
+      width: 58px;
+      height: 58px;
+      display: grid;
+      place-items: center;
+      border-radius: 19px;
+      background: color-mix(in srgb, var(--accent), white 82%);
+      color: var(--accent);
+      font-size: 30px;
+      margin-bottom: 18px;
+    }
+
+    .category-card h3 {
+      font-size: 21px;
+      margin-bottom: 8px;
+      letter-spacing: -0.02em;
+    }
+
+    .category-card p {
+      color: var(--gray);
+      font-size: 15px;
+    }
+
+    /* Products */
+    .products-area {
+      background:
+        radial-gradient(circle at 10% 10%, rgba(56, 189, 248, 0.12), transparent 30%),
+        radial-gradient(circle at 90% 20%, rgba(236, 72, 153, 0.11), transparent 30%),
+        #f8fafc;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .filters {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 34px;
+    }
+
+    .filter-btn {
+      border: 1px solid var(--border);
+      background: var(--white);
+      color: #374151;
+      border-radius: 999px;
+      padding: 11px 17px;
+      font-weight: 900;
+      cursor: pointer;
+      transition: 0.2s ease;
+      font-size: 15px;
+    }
+
+    .filter-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(17, 24, 39, 0.08);
+    }
+
+    .filter-btn.active {
+      color: white;
+      border-color: transparent;
+      background: linear-gradient(135deg, var(--primary), var(--pink));
+      box-shadow: 0 12px 24px rgba(124, 58, 237, 0.24);
+    }
+
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 22px;
+    }
+
+    .product-card {
+      display: flex;
+      flex-direction: column;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 26px;
+      overflow: hidden;
+      box-shadow: 0 12px 26px rgba(17, 24, 39, 0.07);
+      transition: transform 0.22s ease, box-shadow 0.22s ease, opacity 0.2s ease;
+    }
+
+    .product-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow);
+    }
+
+    .product-card.hide {
+      display: none;
+    }
+
+    .product-image {
+      position: relative;
+      height: 210px;
+      display: grid;
+      place-items: center;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.74), transparent 25%),
+        linear-gradient(135deg, var(--image-a), var(--image-b));
+      overflow: hidden;
+    }
+
+    .product-image::before {
+      content: "";
+      position: absolute;
+      width: 170px;
+      height: 170px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.18);
+      right: -54px;
+      top: -54px;
+    }
+
+    .product-image::after {
+      content: "";
+      position: absolute;
+      width: 130px;
+      height: 130px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.14);
+      left: -38px;
+      bottom: -38px;
+    }
+
+    .product-emoji {
+      position: relative;
+      z-index: 1;
+      font-size: 84px;
+      filter: drop-shadow(0 12px 14px rgba(17, 24, 39, 0.18));
+    }
+
+    .product-body {
+      padding: 20px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .product-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(124, 58, 237, 0.1);
+      color: var(--primary-dark);
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .status {
+      font-size: 13px;
+      font-weight: 900;
+      color: #047857;
+      background: rgba(34, 197, 94, 0.12);
+      padding: 6px 10px;
+      border-radius: 999px;
+    }
+
+    .status.limited {
+      color: #b45309;
+      background: rgba(250, 204, 21, 0.18);
+    }
+
+    .status.display {
+      color: #0369a1;
+      background: rgba(56, 189, 248, 0.14);
+    }
+
+    .product-card h3 {
+      font-size: 21px;
+      letter-spacing: -0.03em;
+      line-height: 1.25;
+      margin-bottom: 9px;
+    }
+
+    .product-desc {
+      color: var(--gray);
+      font-size: 15px;
+      margin-bottom: 18px;
+      flex: 1;
+    }
+
+    .product-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-top: auto;
+    }
+
+    .price {
+      font-size: 22px;
+      font-weight: 950;
+      color: var(--black);
+      letter-spacing: -0.03em;
+    }
+
+    .product-bottom .btn {
+      min-height: 42px;
+      padding: 10px 14px;
+      font-size: 14px;
+    }
+
+    .empty-message {
+      display: none;
+      text-align: center;
+      padding: 28px;
+      border: 1px dashed #cbd5e1;
+      border-radius: 22px;
+      background: white;
+      color: var(--gray);
+      font-weight: 800;
+    }
+
+    .empty-message.show {
+      display: block;
+    }
+
+    /* Contact */
+    .contact-card {
+      display: grid;
+      grid-template-columns: 1fr 0.85fr;
+      gap: 28px;
+      padding: 34px;
+      border-radius: 34px;
+      background:
+        linear-gradient(135deg, rgba(124, 58, 237, 0.92), rgba(236, 72, 153, 0.88)),
+        var(--primary);
+      color: white;
+      box-shadow: 0 24px 60px rgba(124, 58, 237, 0.24);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .contact-card::after {
+      content: "";
+      position: absolute;
+      width: 260px;
+      height: 260px;
+      border-radius: 999px;
+      right: -80px;
+      top: -80px;
+      background: rgba(255,255,255,0.13);
+    }
+
+    .contact-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .contact-card h2 {
+      font-size: clamp(30px, 4vw, 48px);
+      line-height: 1.12;
+      letter-spacing: -0.05em;
+      margin-bottom: 14px;
+    }
+
+    .contact-card p {
+      color: rgba(255, 255, 255, 0.88);
+      font-size: 17px;
+      margin-bottom: 22px;
+      max-width: 640px;
+    }
+
+    .contact-info {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      gap: 14px;
+      align-content: center;
+    }
+
+    .info-box {
+      padding: 18px;
+      border-radius: 22px;
+      background: rgba(255,255,255,0.13);
+      border: 1px solid rgba(255,255,255,0.24);
+      backdrop-filter: blur(12px);
+    }
+
+    .info-box strong {
+      display: block;
+      font-size: 15px;
+      margin-bottom: 4px;
+    }
+
+    .info-box span {
+      color: rgba(255,255,255,0.82);
+      font-size: 14px;
+    }
+
+    /* Footer */
+    .footer {
+      padding: 34px 0;
+      border-top: 1px solid var(--border);
+      background: white;
+    }
+
+    .footer-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      color: var(--gray);
+      font-size: 14px;
+    }
+
+    .footer-brand {
+      font-weight: 950;
+      color: var(--black);
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .footer-links a {
+      font-weight: 800;
+    }
+
+    .footer-links a:hover {
+      color: var(--primary);
+    }
+
+    /* Floating WhatsApp */
+    .floating-whatsapp {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      z-index: 60;
+      width: 62px;
+      height: 62px;
+      display: grid;
+      place-items: center;
+      border-radius: 999px;
+      color: white;
+      background: linear-gradient(135deg, var(--green), var(--green-dark));
+      box-shadow: 0 16px 32px rgba(34, 197, 94, 0.34);
+      font-size: 30px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .floating-whatsapp:hover {
+      transform: translateY(-4px) scale(1.03);
+      box-shadow: 0 20px 38px rgba(34, 197, 94, 0.45);
+    }
+
+    .floating-whatsapp::after {
+      content: "查詢";
+      position: absolute;
+      right: 72px;
+      background: #111827;
+      color: white;
+      border-radius: 999px;
+      padding: 7px 11px;
+      font-size: 13px;
+      font-weight: 900;
+      white-space: nowrap;
+      opacity: 0;
+      transform: translateX(8px);
+      transition: 0.2s ease;
+      pointer-events: none;
+    }
+
+    .floating-whatsapp:hover::after {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    /* Responsive */
+    @media (max-width: 980px) {
+      .hero-grid,
+      .contact-card {
+        grid-template-columns: 1fr;
+      }
+
+      .hero {
+        padding-top: 58px;
+      }
+
+      .hero-card-wrap {
+        min-height: auto;
+      }
+
+      .blob {
+        inset: 24px 30px;
+      }
+
+      .showcase-card {
+        margin-top: 28px;
+      }
+
+      .categories-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .products-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .nav-links {
+        display: none;
+      }
+
+      .menu-toggle {
+        display: inline-block;
+      }
+    }
+
+    @media (max-width: 680px) {
+      .container {
+        width: min(100% - 24px, var(--container));
+      }
+
+      .section {
+        padding: 64px 0;
+        scroll-margin-top: 82px;
+      }
+
+      .nav {
+        min-height: 68px;
+      }
+
+      .brand {
+        font-size: 20px;
+      }
+
+      .logo-mark {
+        width: 38px;
+        height: 38px;
+        border-radius: 13px;
+      }
+
+      .nav-actions .btn-whatsapp {
+        display: none;
+      }
+
+      .hero {
+        padding: 48px 0 54px;
+      }
+
+      .hero h1 {
+        font-size: 42px;
+      }
+
+      .hero p {
+        font-size: 17px;
+      }
+
+      .hero-actions {
+        display: grid;
+        grid-template-columns: 1fr;
+      }
+
+      .hero-actions .btn {
+        width: 100%;
+      }
+
+      .hero-points {
+        display: grid;
+        grid-template-columns: 1fr;
+      }
+
+      .showcase-card {
+        padding: 16px;
+        border-radius: 26px;
+      }
+
+      .hero-product-art {
+        height: 190px;
+      }
+
+      .big-icon {
+        font-size: 76px;
+      }
+
+      .categories-grid,
+      .products-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .category-card {
+        padding: 22px 18px;
+      }
+
+      .filters {
+        justify-content: flex-start;
+        overflow-x: auto;
+        padding-bottom: 4px;
+        flex-wrap: nowrap;
+      }
+
+      .filter-btn {
+        flex: 0 0 auto;
+      }
+
+      .product-image {
+        height: 200px;
+      }
+
+      .product-bottom {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .product-bottom .btn {
+        width: 100%;
+      }
+
+      .contact-card {
+        padding: 24px;
+        border-radius: 28px;
+      }
+
+      .contact-card .btn {
+        width: 100%;
+      }
+
+      .footer-inner {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .floating-whatsapp {
+        right: 16px;
+        bottom: 16px;
+        width: 58px;
+        height: 58px;
+      }
+
+      .floating-whatsapp::after {
+        display: none;
+      }
+    }
+
+    @media (max-width: 380px) {
+      .hero h1 {
+        font-size: 36px;
+      }
+
+      .section-title {
+        font-size: 29px;
+      }
+
+      .product-meta {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+  </style>
 </head>
 
 <body>
+  <!-- Header -->
+  <header class="site-header">
+    <div class="container">
+      <nav class="nav" aria-label="主導航">
+        <a class="brand" href="#home" aria-label="Cash2Joy 首頁">
+          <span class="logo-mark">C2J</span>
+          <span>Cash2Joy</span>
+        </a>
 
-<header class="topbar">
-<div class="brand">
-<div class="title">歸家通勤儀表板</div>
-<div class="subtitle">放工了，看看哪班車帶你回家</div>
-</div>
+        <div class="nav-links">
+          <a href="#categories">商品分類</a>
+          <a href="#products">貨物展示</a>
+          <a href="#contact">聯絡我們</a>
+        </div>
 
-<div class="top-info">
-<div class="clock" id="clock">--:--:--</div>
-</div>
-  
-<div class="top-info">
-<div class="info-pill" id="date">--</div>
-<div class="info-pill weather" id="weather">天氣載入中</div>
-</div>
-  
-</header>
+        <div class="nav-actions">
+          <a id="navWhatsapp" class="btn btn-whatsapp" href="#" target="_blank" rel="noopener">
+            💬 WhatsApp 查詢
+          </a>
 
-<main class="main">
+          <button class="menu-toggle" id="menuToggle" type="button" aria-label="開啟選單" aria-expanded="false">
+            <span class="menu-lines" aria-hidden="true">
+              <span></span>
+              <span></span>
+              <span></span>
+            </span>
+          </button>
+        </div>
+      </nav>
 
-<div class="section-title">
-<h2>回家巴士</h2>
-<div class="hint">自動更新到站時間</div>
-</div>
+      <div class="mobile-menu" id="mobileMenu">
+        <div class="mobile-menu-inner">
+          <a href="#categories">商品分類</a>
+          <a href="#products">貨物展示</a>
+          <a href="#contact">聯絡我們</a>
+          <a id="mobileWhatsapp" class="btn btn-whatsapp" href="#" target="_blank" rel="noopener">
+            💬 WhatsApp 查詢
+          </a>
+        </div>
+      </div>
+    </div>
+  </header>
 
-<section id="busList" class="bus-list">
-<div class="empty">正在載入巴士到站資訊...</div>
-</section>
+  <main id="home">
+    <!-- Hero -->
+    <section class="hero">
+      <div class="container">
+        <div class="hero-grid">
+          <div>
+            <span class="eyebrow">🔥 一頁式精選貨物展示</span>
+            <h1>
+              Cash2Joy<br />
+              <span class="gradient-text">精選貨物展示</span>
+            </h1>
+            <p>
+              瀏覽收藏卡、潮流玩具、遊戲精品及生活好物。
+              如對任何貨品有興趣，可直接 WhatsApp 查詢。
+            </p>
 
-</main>
+            <div class="hero-actions">
+              <a class="btn btn-primary" href="#products">🛍️ 睇貨物展示</a>
+              <a id="heroWhatsapp" class="btn btn-whatsapp" href="#" target="_blank" rel="noopener">
+                💬 WhatsApp 查詢
+              </a>
+            </div>
 
-<footer class="bottombar">
-<div>下一站：<span class="footer-strong">屋企</span></div>
-<div>最後更新：<span class="footer-strong" id="lastUpdate">--</span></div>
-<div>資料來源：KMB / HKO</div>
-</footer>
+            <div class="hero-points" aria-label="網站功能">
+              <span class="point">✅ 同頁瀏覽</span>
+              <span class="point">✅ 快速篩選</span>
+              <span class="point">✅ WhatsApp 查詢</span>
+              <span class="point">✅ 手機友好</span>
+            </div>
+          </div>
 
-<script>
-const SERVICE_TYPE="1";
+          <div class="hero-card-wrap" aria-hidden="true">
+            <div class="blob"></div>
+            <div class="showcase-card">
+              <div class="showcase-top">
+                <span class="badge-hot">本週精選</span>
+                <span class="mini-price">HK$280</span>
+              </div>
+              <div class="hero-product-art">
+                <span class="big-icon">🃏</span>
+              </div>
+              <h3>人氣收藏卡系列</h3>
+              <p>精選展示貨品，直接 WhatsApp 查詢狀態及交收方式。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-/*
-  ✅ 之後想加入更多巴士，只需要在這裡加：
-  {route:"路線",stopId:"巴士站ID"}
-*/
-const ROUTES=[
-{route:"31B",stopId:"C3672D8D28801773"},
-{route:"35A",stopId:"C3672D8D28801773"},
-{route:"36B",stopId:"C3672D8D28801773"},
-{route:"38",stopId:"7CB0618D76B5F553"},
-{route:"37",stopId:"98A42EFF69A579A0"}
-];
+    <!-- Categories -->
+    <section id="categories" class="section">
+      <div class="container">
+        <div class="section-header">
+          <span class="eyebrow">分類瀏覽</span>
+          <h2 class="section-title">商品分類</h2>
+          <p class="section-desc">
+            Cash2Joy 集中展示多款精選貨品，分類清晰，方便快速搵到你有興趣嘅款式。
+          </p>
+        </div>
 
-let etaData={};
-let stopNames={};
+        <div class="categories-grid">
+          <article class="category-card" style="--accent:#7c3aed;">
+            <div class="category-icon">🃏</div>
+            <h3>收藏卡</h3>
+            <p>熱門卡牌、收藏卡、限定卡款及相關精品。</p>
+          </article>
 
-function updateClock(){
-const now=new Date();
+          <article class="category-card" style="--accent:#ec4899;">
+            <div class="category-icon">🧸</div>
+            <h3>潮流玩具</h3>
+            <p>潮玩公仔、盲盒、設計師玩具及收藏擺設。</p>
+          </article>
 
-document.getElementById("clock").innerText=
-now.toLocaleTimeString("zh-HK",{
-hour:"2-digit",
-minute:"2-digit",
-second:"2-digit",
-hour12:false
-});
+          <article class="category-card" style="--accent:#38bdf8;">
+            <div class="category-icon">🎮</div>
+            <h3>遊戲精品</h3>
+            <p>遊戲周邊、主題精品、角色收藏品。</p>
+          </article>
 
-document.getElementById("date").innerText=
-now.toLocaleDateString("zh-HK",{
-weekday:"short",
-month:"short",
-day:"2-digit"
-});
-}
+          <article class="category-card" style="--accent:#22c55e;">
+            <div class="category-icon">✨</div>
+            <h3>生活好物</h3>
+            <p>實用小物、潮流配件及日常精選好物。</p>
+          </article>
+        </div>
+      </div>
+    </section>
 
-function getMinutes(t){
-if(!t) return "--";
+    <!-- Products -->
+    <section id="products" class="section products-area">
+      <div class="container">
+        <div class="section-header">
+          <span class="eyebrow">貨物展示</span>
+          <h2 class="section-title">精選貨物</h2>
+          <p class="section-desc">
+            以下貨品只作展示及查詢用途。如有興趣，請直接透過 WhatsApp 查詢貨品狀態、現貨情況及交收方式。
+          </p>
+        </div>
 
-const diff=new Date(t)-new Date();
+        <div class="filters" aria-label="商品篩選">
+          <button class="filter-btn active" type="button" data-filter="all">全部</button>
+          <button class="filter-btn" type="button" data-filter="card">收藏卡</button>
+          <button class="filter-btn" type="button" data-filter="toy">潮玩</button>
+          <button class="filter-btn" type="button" data-filter="game">遊戲</button>
+          <button class="filter-btn" type="button" data-filter="life">好物</button>
+        </div>
 
-if(isNaN(diff)) return "--";
+        <div class="products-grid" id="productsGrid">
+          <article class="product-card" data-category="card">
+            <div class="product-image" style="--image-a:#7c3aed; --image-b:#ec4899;">
+              <span class="product-emoji">🃏</span>
+            </div>
+            <div class="product-body">
+              <div class="product-meta">
+                <span class="tag">收藏卡</span>
+                <span class="status">現貨展示</span>
+              </div>
+              <h3>人氣收藏卡精選套裝</h3>
+              <p class="product-desc">
+                精選人氣收藏卡套裝，適合收藏或送禮，實物狀態可 WhatsApp 查詢。
+              </p>
+              <div class="product-bottom">
+                <span class="price">HK$280</span>
+                <a class="btn btn-whatsapp product-whatsapp"
+                   href="#"
+                   target="_blank"
+                   rel="noopener"
+                   data-name="人氣收藏卡精選套裝"
+                   data-price="280">
+                  💬 查詢
+                </a>
+              </div>
+            </div>
+          </article>
 
-return Math.max(0,Math.floor(diff/60000));
-}
+          <article class="product-card" data-category="toy">
+            <div class="product-image" style="--image-a:#ec4899; --image-b:#facc15;">
+              <span class="product-emoji">🧸</span>
+            </div>
+            <div class="product-body">
+              <div class="product-meta">
+                <span class="tag">潮流玩具</span>
+                <span class="status limited">少量展示</span>
+              </div>
+              <h3>設計師潮玩公仔</h3>
+              <p class="product-desc">
+                色彩鮮明嘅設計師玩具，適合擺設及收藏，詳情歡迎查詢。
+              </p>
+              <div class="product-bottom">
+                <span class="price">HK$420</span>
+                <a class="btn btn-whatsapp product-whatsapp"
+                   href="#"
+                   target="_blank"
+                   rel="noopener"
+                   data-name="設計師潮玩公仔"
+                   data-price="420">
+                  💬 查詢
+                </a>
+              </div>
+            </div>
+          </article>
 
-function getEtaClass(m){
-if(m==="--") return "";
-if(m<=3) return "red";
-if(m<=8) return "orange";
-return "green";
-}
+          <article class="product-card" data-category="game">
+            <div class="product-image" style="--image-a:#38bdf8; --image-b:#7c3aed;">
+              <span class="product-emoji">🎮</span>
+            </div>
+            <div class="product-body">
+              <div class="product-meta">
+                <span class="tag">遊戲精品</span>
+                <span class="status display">展示中</span>
+              </div>
+              <h3>遊戲角色精品組</h3>
+              <p class="product-desc">
+                遊戲角色主題精品組，包括小擺件及收藏配件，歡迎查詢現況。
+              </p>
+              <div class="product-bottom">
+                <span class="price">HK$198</span>
+                <a class="btn btn-whatsapp product-whatsapp"
+                   href="#"
+                   target="_blank"
+                   rel="noopener"
+                   data-name="遊戲角色精品組"
+                   data-price="198">
+                  💬 查詢
+                </a>
+              </div>
+            </div>
+          </article>
 
-function getHomeStatus(m){
-if(m==="--"){
-return {text:"未有資料",class:"gray"};
-}
+          <article class="product-card" data-category="life">
+            <div class="product-image" style="--image-a:#22c55e; --image-b:#38bdf8;">
+              <span class="product-emoji">🎒</span>
+            </div>
+            <div class="product-body">
+              <div class="product-meta">
+                <span class="tag">生活好物</span>
+                <span class="status">現貨展示</span>
+              </div>
+              <h3>潮流實用小袋</h3>
+              <p class="product-desc">
+                輕便實用嘅日常小袋，適合外出收納，款式簡約易襯。
+              </p>
+              <div class="product-bottom">
+                <span class="price">HK$150</span>
+                <a class="btn btn-whatsapp product-whatsapp"
+                   href="#"
+                   target="_blank"
+                   rel="noopener"
+                   data-name="潮流實用小袋"
+                   data-price="150">
+                  💬 查詢
+                </a>
+              </div>
+            </div>
+          </article>
 
-if(m<=1){
-return {text:"即將到站",class:"red"};
-}
+          <article class="product-card" data-category="card">
+            <div class="product-image" style="--image-a:#5b21b6; --image-b:#38bdf8;">
+              <span class="product-emoji">⭐</span>
+            </div>
+            <div class="product-body">
+              <div class="product-meta">
+                <span class="tag">收藏卡</span>
+                <span class="status limited">少量展示</span>
+              </div>
+              <h3>閃卡收藏展示款</h3>
+              <p class="product-desc">
+                閃面效果收藏卡款，適合卡牌愛好者查詢及收藏參考。
+              </p>
+              <div class="product-bottom">
+                <span class="price">HK$360</span>
+                <a class="btn btn-whatsapp product-whatsapp"
+                   href="#"
+                   target="_blank"
+                   rel="noopener"
+                   data-name="閃卡收藏展示款"
+                   data-price="360">
+                  💬 查詢
+                </a>
+              </div>
+            </div>
+          </article>
 
-if(m<=3){
-return {text:"要出門了",class:"red"};
-}
+          <article class="product-card" data-category="toy">
+            <div class="product-image" style="--image-a:#fb7185; --image-b:#7c3aed;">
+              <span class="product-emoji">🤖</span>
+            </div>
+            <div class="product-body">
+              <div class="product-meta">
+                <span class="tag">潮流玩具</span>
+                <span class="status display">展示中</span>
+              </div>
+              <h3>機械風格收藏模型</h3>
+              <p class="product-desc">
+                型格機械主題收藏模型，擺設感強，歡迎查詢尺寸及狀態。
+              </p>
+              <div class="product-bottom">
+                <span class="price">HK$520</span>
+                <a class="btn btn-whatsapp product-whatsapp"
+                   href="#"
+                   target="_blank"
+                   rel="noopener"
+                   data-name="機械風格收藏模型"
+                   data-price="520">
+                  💬 查詢
+                </a>
+              </div>
+            </div>
+          </article>
 
-if(m<=8){
-return {text:"剛剛好",class:"orange"};
-}
+          <article class="product-card" data-category="game">
+            <div class="product-image" style="--image-a:#0ea5e9; --image-b:#22c55e;">
+              <span class="product-emoji">🕹️</span>
+            </div>
+            <div class="product-body">
+              <div class="product-meta">
+                <span class="tag">遊戲精品</span>
+                <span class="status">現貨展示</span>
+              </div>
+              <h3>復古遊戲主題小物</h3>
+              <p class="product-desc">
+                復古遊戲風格精品小物，適合桌面擺設及遊戲迷收藏。
+              </p>
+              <div class="product-bottom">
+                <span class="price">HK$120</span>
+                <a class="btn btn-whatsapp product-whatsapp"
+                   href="#"
+                   target="_blank"
+                   rel="noopener"
+                   data-name="復古遊戲主題小物"
+                   data-price="120">
+                  💬 查詢
+                </a>
+              </div>
+            </div>
+          </article>
 
-if(m<=15){
-return {text:"可以慢慢嚟",class:"green"};
-}
+          <article class="product-card" data-category="life">
+            <div class="product-image" style="--image-a:#14b8a6; --image-b:#f472b6;">
+              <span class="product-emoji">☕</span>
+            </div>
+            <div class="product-body">
+              <div class="product-meta">
+                <span class="tag">生活好物</span>
+                <span class="status display">展示中</span>
+              </div>
+              <h3>生活風格杯具</h3>
+              <p class="product-desc">
+                簡約又有特色嘅生活杯具，適合日常使用或作小禮物。
+              </p>
+              <div class="product-bottom">
+                <span class="price">HK$98</span>
+                <a class="btn btn-whatsapp product-whatsapp"
+                   href="#"
+                   target="_blank"
+                   rel="noopener"
+                   data-name="生活風格杯具"
+                   data-price="98">
+                  💬 查詢
+                </a>
+              </div>
+            </div>
+          </article>
 
-return {text:"仲有時間",class:"green"};
-}
+          <article class="product-card" data-category="card">
+            <div class="product-image" style="--image-a:#a855f7; --image-b:#f59e0b;">
+              <span class="product-emoji">📦</span>
+            </div>
+            <div class="product-body">
+              <div class="product-meta">
+                <span class="tag">收藏卡</span>
+                <span class="status">現貨展示</span>
+              </div>
+              <h3>收藏卡保護配件組</h3>
+              <p class="product-desc">
+                收藏卡保護及收納配件，適合日常整理卡牌收藏。
+              </p>
+              <div class="product-bottom">
+                <span class="price">HK$88</span>
+                <a class="btn btn-whatsapp product-whatsapp"
+                   href="#"
+                   target="_blank"
+                   rel="noopener"
+                   data-name="收藏卡保護配件組"
+                   data-price="88">
+                  💬 查詢
+                </a>
+              </div>
+            </div>
+          </article>
+        </div>
 
-async function fetchStopName(stopId){
-if(stopNames[stopId]) return;
+        <div class="empty-message" id="emptyMessage">
+          暫時未有此分類貨品展示。
+        </div>
+      </div>
+    </section>
 
-try{
-const res=await fetch(`https://data.etabus.gov.hk/v1/transport/kmb/stop/${stopId}`);
-const data=await res.json();
+    <!-- Contact -->
+    <section id="contact" class="section">
+      <div class="container">
+        <div class="contact-card">
+          <div class="contact-content">
+            <span class="eyebrow" style="background:rgba(255,255,255,0.16);color:white;">聯絡我們</span>
+            <h2>有興趣？直接 WhatsApp 查詢</h2>
+            <p>
+              歡迎查詢貨品價格、狀態、是否仍有現貨及交收方式。
+              Cash2Joy 網站只作貨物展示及 WhatsApp 查詢用途，不設購物車或網上付款。
+            </p>
+            <a id="contactWhatsapp" class="btn btn-whatsapp" href="#" target="_blank" rel="noopener">
+              💬 立即 WhatsApp 查詢
+            </a>
+          </div>
 
-stopNames[stopId]=data?.data?.name_tc || "--";
-}catch{
-stopNames[stopId]="--";
-}
-}
+          <div class="contact-info">
+            <div class="info-box">
+              <strong>查詢方式</strong>
+              <span>WhatsApp 即時查詢貨品資料</span>
+            </div>
+            <div class="info-box">
+              <strong>網站用途</strong>
+              <span>展示收藏卡、潮流玩具、遊戲精品及生活好物</span>
+            </div>
+            <div class="info-box">
+              <strong>備註</strong>
+              <span>所有貨品資料以 WhatsApp 回覆確認為準</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
 
-function render(){
-const list=document.getElementById("busList");
-list.innerHTML="";
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <div>
+          <div class="footer-brand">Cash2Joy</div>
+          <div>© <span id="year"></span> Cash2Joy. 一頁式貨物展示網站。</div>
+        </div>
 
-if(ROUTES.length===0){
-list.innerHTML=`<div class="empty">尚未加入任何回家巴士路線</div>`;
-return;
-}
+        <div class="footer-links">
+          <a href="#categories">商品分類</a>
+          <a href="#products">貨物展示</a>
+          <a href="#contact">聯絡我們</a>
+        </div>
+      </div>
+    </div>
+  </footer>
 
-ROUTES.forEach(r=>{
-const key=r.route+"_"+r.stopId;
-const etas=etaData[key]||[];
+  <!-- Floating WhatsApp Button -->
+  <a id="floatingWhatsapp" class="floating-whatsapp" href="#" target="_blank" rel="noopener" aria-label="WhatsApp 查詢">
+    💬
+  </a>
 
-const m1=getMinutes(etas[0]);
-const m2=getMinutes(etas[1]);
+  <script>
+    /*
+      ============================
+      Cash2Joy 網站設定
+      ============================
+      修改以下 WhatsApp 號碼即可。
+      格式例子：
+      香港號碼：85291234567
+      不需要加 + 號、空格或符號。
+    */
+    const WHATSAPP_NUMBER = "85291234567";
 
-const etaClass=getEtaClass(m1);
-const status=getHomeStatus(m1);
-const station=stopNames[r.stopId]||"--";
+    const GENERAL_MESSAGE = "你好，我想查詢 Cash2Joy 的貨品，想了解價格、狀態及交收方式。";
 
-const card=document.createElement("article");
-card.className="bus-card";
+    function createWhatsappLink(message) {
+      return "https://wa.me/" + WHATSAPP_NUMBER + "?text=" + encodeURIComponent(message);
+    }
 
-card.innerHTML=`
-<div class="route ${m1 !== "--" && m1 <= 3 ? "soon" : ""}">
-${r.route}
-</div>
+    function setGeneralWhatsappLinks() {
+      const ids = [
+        "navWhatsapp",
+        "mobileWhatsapp",
+        "heroWhatsapp",
+        "contactWhatsapp",
+        "floatingWhatsapp"
+      ];
 
-<div class="eta-main">
-<div class="eta-label">下一班</div>
-<div class="eta-time ${etaClass}">
-${m1 === "--" ? "--" : m1} 分鐘
-</div>
-<div class="eta-next">
-再下一班：${m2 === "--" ? "--" : m2 + " 分鐘"}
-</div>
-</div>
+      ids.forEach(function(id) {
+        const element = document.getElementById(id);
+        if (element) {
+          element.href = createWhatsappLink(GENERAL_MESSAGE);
+        }
+      });
+    }
 
-<div class="station">
-<div class="station-label">上車站</div>
-<div class="station-name">${station}</div>
-</div>
+    function setProductWhatsappLinks() {
+      const productButtons = document.querySelectorAll(".product-whatsapp");
 
-<div class="home-status">
-<span class="status-pill ${status.class}">
-${status.text}
-</span>
-</div>
-`;
+      productButtons.forEach(function(button) {
+        const name = button.getAttribute("data-name");
+        const price = button.getAttribute("data-price");
 
-list.appendChild(card);
-});
-}
+        const message =
+          "你好，我想查詢 Cash2Joy 的「" +
+          name +
+          "」，標示價格為 HK$" +
+          price +
+          "，想了解貨品狀態、是否仍有現貨及交收方式。";
 
-async function fetchETA(){
-await Promise.all(ROUTES.map(async r=>{
-await fetchStopName(r.stopId);
+        button.href = createWhatsappLink(message);
+      });
+    }
 
-const key=r.route+"_"+r.stopId;
+    function setupMobileMenu() {
+      const menuToggle = document.getElementById("menuToggle");
+      const mobileMenu = document.getElementById("mobileMenu");
+      const mobileLinks = mobileMenu.querySelectorAll("a");
 
-try{
-const res=await fetch(
-`https://data.etabus.gov.hk/v1/transport/kmb/eta/${r.stopId}/${r.route}/${SERVICE_TYPE}`
-);
+      menuToggle.addEventListener("click", function() {
+        const isOpen = mobileMenu.classList.toggle("open");
+        menuToggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+      });
 
-const data=await res.json();
+      mobileLinks.forEach(function(link) {
+        link.addEventListener("click", function() {
+          mobileMenu.classList.remove("open");
+          menuToggle.setAttribute("aria-expanded", "false");
+        });
+      });
+    }
 
-if(data?.data && data.data.length>0){
-etaData[key]=data.data.slice(0,2).map(x=>x.eta);
-}else{
-etaData[key]=[];
-}
+    function setupProductFilters() {
+      const filterButtons = document.querySelectorAll(".filter-btn");
+      const products = document.querySelectorAll(".product-card");
+      const emptyMessage = document.getElementById("emptyMessage");
 
-}catch{
-etaData[key]=[];
-}
-}));
+      filterButtons.forEach(function(button) {
+        button.addEventListener("click", function() {
+          const filter = button.getAttribute("data-filter");
+          let visibleCount = 0;
 
-document.getElementById("lastUpdate").innerText=
-new Date().toLocaleTimeString("zh-HK",{
-hour:"2-digit",
-minute:"2-digit",
-second:"2-digit",
-hour12:false
-});
+          filterButtons.forEach(function(btn) {
+            btn.classList.remove("active");
+          });
+          button.classList.add("active");
 
-render();
-}
+          products.forEach(function(product) {
+            const category = product.getAttribute("data-category");
+            const shouldShow = filter === "all" || category === filter;
 
-async function fetchWeather(){
-try{
-const res=await fetch("https://data.weather.gov.hk/weatherAPI/opendata/weather.php?dataType=rhrread&lang=tc");
-const data=await res.json();
+            if (shouldShow) {
+              product.classList.remove("hide");
+              visibleCount++;
+            } else {
+              product.classList.add("hide");
+            }
+          });
 
-const temp=data?.temperature?.data?.[0]?.value ?? "--";
-const humidity=data?.humidity?.data?.[0]?.value ?? "--";
-const iconCode=data?.icon?.[0];
+          if (visibleCount === 0) {
+            emptyMessage.classList.add("show");
+          } else {
+            emptyMessage.classList.remove("show");
+          }
+        });
+      });
+    }
 
-const iconUrl=iconCode
-?`https://www.hko.gov.hk/images/HKOWxIconOutline/pic${iconCode}.png`
-:"";
+    function setupCurrentYear() {
+      const yearElement = document.getElementById("year");
+      if (yearElement) {
+        yearElement.textContent = new Date().getFullYear();
+      }
+    }
 
-document.getElementById("weather").innerHTML=`
-${iconUrl?`<img src="${iconUrl}" alt="weather icon">`:""}
-<span>${temp}°C</span>
-<span>💧${humidity}%</span>
-`;
-}catch{
-document.getElementById("weather").innerText="天氣未能載入";
-}
-}
+    function setupSmoothAnchorClose() {
+      const anchorLinks = document.querySelectorAll('a[href^="#"]');
 
-updateClock();
-fetchETA();
-fetchWeather();
+      anchorLinks.forEach(function(link) {
+        link.addEventListener("click", function(event) {
+          const targetId = link.getAttribute("href");
 
-setInterval(updateClock,1000);
-setInterval(fetchETA,15000);
-setInterval(fetchWeather,600000);
-</script>
+          if (!targetId || targetId === "#") {
+            return;
+          }
 
+          const target = document.querySelector(targetId);
+
+          if (target) {
+            event.preventDefault();
+            target.scrollIntoView({
+              behavior: "smooth",
+              block: "start"
+            });
+          }
+        });
+      });
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+      setGeneralWhatsappLinks();
+      setProductWhatsappLinks();
+      setupMobileMenu();
+      setupProductFilters();
+      setupCurrentYear();
+      setupSmoothAnchorClose();
+    });
+  </script>
 </body>
 </html>
