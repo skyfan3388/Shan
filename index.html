@@ -4,18 +4,24 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<title>巴士通勤儀表板</title>
+<title>回家巴士</title>
 
 <style>
 :root{
-  --main:#99e6ff;
-  --main-dark:#7ae9f5;
-  --bg#18242d;
-  --card:#f2f7fa;
-  --card-light:#22313c;
-  --text:#ffffff;
-  --muted:#aebbc4;
+  --cream:#fff8ec;
+  --cream-deep:#f7ead7;
+  --warm-white:#ffffff;
+  --sky:#dff5ff;
+  --sky-deep:#8fdcff;
+  --blue:#357c9c;
+  --blue-dark:#1f526b;
+  --orange:#ffb36b;
+  --orange-deep:#ff8f3f;
+  --text:#2f3f46;
+  --muted:#7a8b91;
+  --border:#f0dfc9;
   --danger:#ff6b6b;
+  --shadow:rgba(135,98,48,0.14);
 }
 
 html,body{
@@ -23,32 +29,113 @@ html,body{
   padding:0;
   min-height:100%;
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,"Microsoft JhengHei",sans-serif;
-  background:var(--bg);
+  background:
+    radial-gradient(circle at top left, rgba(255,179,107,0.22), transparent 28%),
+    radial-gradient(circle at top right, rgba(143,220,255,0.28), transparent 30%),
+    linear-gradient(180deg,var(--cream),#f7fbff);
   color:var(--text);
 }
 
 /* ===== Top Bar ===== */
 .topbar{
-  background:var(--main);
-  color:#102027;
+  background:rgba(255,255,255,0.82);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  color:var(--text);
   display:flex;
   justify-content:space-between;
   align-items:center;
   gap:16px;
-  padding:18px 22px;
+  padding:14px 20px;
   font-weight:800;
   position:sticky;
   top:0;
   z-index:10;
+  border-bottom:1px solid rgba(240,223,201,0.85);
+  box-shadow:0 6px 20px var(--shadow);
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  min-width:0;
+}
+
+.logo{
+  width:42px;
+  height:42px;
+  object-fit:contain;
+  border-radius:12px;
+  background:#ffffff;
+  box-shadow:0 4px 12px rgba(31,82,107,0.12);
+  flex-shrink:0;
+}
+
+.brand-text{
+  display:flex;
+  flex-direction:column;
+  min-width:0;
 }
 
 .title{
-  font-size:24px;
+  font-size:22px;
+  line-height:1.15;
+  color:var(--blue-dark);
+  white-space:nowrap;
+}
+
+.subtitle{
+  font-size:13px;
+  font-weight:600;
+  color:var(--muted);
+  margin-top:3px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.clock-wrap{
+  text-align:right;
+  flex-shrink:0;
 }
 
 .clock{
-  font-size:32px;
+  font-size:30px;
   letter-spacing:1px;
+  color:var(--blue-dark);
+}
+
+.clock-label{
+  font-size:12px;
+  color:var(--muted);
+  font-weight:600;
+  margin-top:2px;
+}
+
+/* ===== Welcome Card ===== */
+.hero{
+  margin:16px 16px 0;
+  padding:18px;
+  border-radius:22px;
+  background:
+    linear-gradient(135deg,rgba(255,255,255,0.9),rgba(223,245,255,0.88)),
+    linear-gradient(135deg,var(--cream),var(--sky));
+  border:1px solid rgba(240,223,201,0.75);
+  box-shadow:0 10px 24px var(--shadow);
+}
+
+.hero-title{
+  font-size:22px;
+  font-weight:900;
+  color:var(--blue-dark);
+  margin-bottom:6px;
+}
+
+.hero-desc{
+  color:var(--muted);
+  font-size:14px;
+  line-height:1.6;
 }
 
 /* ===== Control Bar ===== */
@@ -57,9 +144,12 @@ html,body{
   justify-content:space-between;
   align-items:center;
   gap:12px;
-  padding:14px 18px;
-  background:#0c1319;
-  border-bottom:1px solid rgba(153,230,255,0.2);
+  margin:14px 16px 0;
+  padding:14px 16px;
+  background:rgba(255,255,255,0.78);
+  border:1px solid rgba(240,223,201,0.78);
+  border-radius:18px;
+  box-shadow:0 8px 18px rgba(135,98,48,0.08);
 }
 
 .info{
@@ -68,26 +158,33 @@ html,body{
   line-height:1.6;
 }
 
+.info strong{
+  color:var(--blue-dark);
+}
+
 .update-btn{
   border:0;
-  background:var(--main);
-  color:#102027;
-  font-weight:800;
-  padding:10px 16px;
+  background:linear-gradient(135deg,var(--orange),var(--orange-deep));
+  color:#ffffff;
+  font-weight:900;
+  padding:11px 18px;
   border-radius:999px;
   cursor:pointer;
   font-size:15px;
   transition:0.2s;
   white-space:nowrap;
+  box-shadow:0 6px 14px rgba(255,143,63,0.28);
 }
 
 .update-btn:hover{
-  background:var(--main-dark);
+  transform:translateY(-1px);
+  box-shadow:0 8px 18px rgba(255,143,63,0.34);
 }
 
 .update-btn:disabled{
-  opacity:0.6;
+  opacity:0.65;
   cursor:not-allowed;
+  transform:none;
 }
 
 /* ===== Main ===== */
@@ -95,52 +192,84 @@ html,body{
   padding:16px;
 }
 
+.section-title{
+  font-size:16px;
+  font-weight:900;
+  color:var(--blue-dark);
+  margin:2px 2px 12px;
+}
+
 .bus-list{
   display:flex;
   flex-direction:column;
-  gap:12px;
+  gap:13px;
 }
 
 /* ===== Card ===== */
 .bus-card{
-  background:linear-gradient(145deg,var(--card),var(--card-light));
-  border:1px solid rgba(153,230,255,0.18);
-  border-radius:18px;
+  position:relative;
+  overflow:hidden;
+  background:
+    linear-gradient(145deg,rgba(255,255,255,0.96),rgba(255,248,236,0.96));
+  border:1px solid rgba(240,223,201,0.9);
+  border-radius:22px;
   padding:16px;
   display:grid;
-  grid-template-columns:90px 1fr auto;
+  grid-template-columns:92px 1fr auto;
   gap:14px;
   align-items:center;
-  box-shadow:0 8px 20px rgba(0,0,0,0.25);
+  box-shadow:0 10px 24px rgba(135,98,48,0.11);
+}
+
+.bus-card::after{
+  content:"";
+  position:absolute;
+  right:-40px;
+  top:-40px;
+  width:120px;
+  height:120px;
+  background:rgba(143,220,255,0.26);
+  border-radius:50%;
+  pointer-events:none;
 }
 
 .route-box{
-  background:var(--main);
-  color:#102027;
+  position:relative;
+  z-index:1;
+  background:linear-gradient(135deg,var(--sky),var(--sky-deep));
+  color:var(--blue-dark);
   font-size:34px;
-  font-weight:900;
-  height:72px;
-  border-radius:16px;
+  font-weight:950;
+  height:74px;
+  border-radius:18px;
   display:flex;
   justify-content:center;
   align-items:center;
   text-align:center;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,0.65);
 }
 
 .route-box.urgent-box{
-  background:var(--danger);
+  background:linear-gradient(135deg,#ff8a8a,var(--danger));
   color:#fff;
   animation:pulse 1s infinite;
 }
 
 .bus-main{
+  position:relative;
+  z-index:1;
   min-width:0;
 }
 
 .destination{
   font-size:20px;
-  font-weight:800;
+  font-weight:900;
   margin-bottom:6px;
+  color:var(--text);
+}
+
+.destination .home-word{
+  color:var(--orange-deep);
 }
 
 .station{
@@ -151,15 +280,30 @@ html,body{
   text-overflow:ellipsis;
 }
 
+.station::before{
+  content:"上車站：";
+  color:#96a4a9;
+}
+
 .eta-box{
+  position:relative;
+  z-index:1;
   text-align:right;
-  min-width:95px;
+  min-width:105px;
+}
+
+.eta-label{
+  font-size:12px;
+  color:var(--muted);
+  font-weight:700;
+  margin-bottom:3px;
 }
 
 .next-time{
   font-size:30px;
-  font-weight:900;
-  color:var(--main);
+  font-weight:950;
+  color:var(--blue);
+  line-height:1.1;
 }
 
 .next-time.urgent{
@@ -168,38 +312,51 @@ html,body{
 }
 
 .second-time{
-  margin-top:4px;
+  margin-top:5px;
   color:var(--muted);
   font-size:14px;
 }
 
 .status{
-  margin-top:6px;
+  margin-top:7px;
+  display:inline-block;
   font-size:13px;
-  color:var(--muted);
+  color:var(--blue-dark);
+  background:rgba(223,245,255,0.85);
+  padding:4px 9px;
+  border-radius:999px;
+  font-weight:800;
 }
 
 .status.urgent{
-  color:var(--danger);
-  font-weight:800;
+  color:#ffffff;
+  background:var(--danger);
 }
 
 /* ===== Bottom ===== */
 .bottombar{
   color:var(--muted);
   font-size:13px;
-  padding:14px 18px 22px;
+  padding:4px 18px 24px;
   display:flex;
   justify-content:space-between;
   gap:12px;
   flex-wrap:wrap;
 }
 
+.bottombar span{
+  color:var(--blue-dark);
+  font-weight:800;
+}
+
 /* ===== Loading / Empty ===== */
 .message{
   color:var(--muted);
   text-align:center;
-  padding:30px 10px;
+  padding:34px 10px;
+  background:rgba(255,255,255,0.65);
+  border:1px dashed rgba(240,223,201,0.9);
+  border-radius:18px;
 }
 
 /* ===== Animations ===== */
@@ -211,25 +368,52 @@ html,body{
 
 @keyframes pulse{
   0%{box-shadow:0 0 0 rgba(255,107,107,0);}
-  50%{box-shadow:0 0 18px rgba(255,107,107,0.85);}
+  50%{box-shadow:0 0 20px rgba(255,107,107,0.68);}
   100%{box-shadow:0 0 0 rgba(255,107,107,0);}
 }
 
 /* ===== Mobile ===== */
 @media(max-width:600px){
   .topbar{
-    padding:14px 16px;
+    padding:12px 14px;
+    gap:10px;
+  }
+
+  .logo{
+    width:38px;
+    height:38px;
+    border-radius:10px;
   }
 
   .title{
-    font-size:20px;
+    font-size:19px;
+  }
+
+  .subtitle{
+    font-size:12px;
+    max-width:150px;
   }
 
   .clock{
-    font-size:26px;
+    font-size:25px;
+  }
+
+  .clock-label{
+    display:none;
+  }
+
+  .hero{
+    margin:14px 12px 0;
+    padding:16px;
+    border-radius:20px;
+  }
+
+  .hero-title{
+    font-size:20px;
   }
 
   .controlbar{
+    margin:12px 12px 0;
     align-items:flex-start;
     flex-direction:column;
   }
@@ -238,18 +422,24 @@ html,body{
     width:100%;
   }
 
+  .panel{
+    padding:12px;
+  }
+
   .bus-card{
-    grid-template-columns:72px 1fr;
+    grid-template-columns:74px 1fr;
     grid-template-areas:
       "route main"
       "route eta";
+    padding:14px;
+    border-radius:20px;
   }
 
   .route-box{
     grid-area:route;
-    width:72px;
+    width:74px;
     height:100%;
-    min-height:96px;
+    min-height:106px;
     font-size:28px;
   }
 
@@ -260,10 +450,15 @@ html,body{
   .eta-box{
     grid-area:eta;
     text-align:left;
+    min-width:0;
   }
 
   .next-time{
-    font-size:26px;
+    font-size:27px;
+  }
+
+  .destination{
+    font-size:18px;
   }
 }
 </style>
@@ -273,32 +468,53 @@ html,body{
 
 <!-- Top Bar -->
 <div class="topbar">
-  <div class="title">巴士通勤</div>
-  <div class="clock" id="clock">--:--</div>
+  <div class="brand">
+    <img class="logo" src="/icon/icon.png" alt="回家巴士 Logo">
+    <div class="brand-text">
+      <div class="title">回家巴士</div>
+      <div class="subtitle">陪你睇住下一班歸家的車</div>
+    </div>
+  </div>
+
+  <div class="clock-wrap">
+    <div class="clock" id="clock">--:--</div>
+    <div class="clock-label">而家時間</div>
+  </div>
+</div>
+
+<!-- Welcome -->
+<div class="hero">
+  <div class="hero-title">準備返屋企啦</div>
+  <div class="hero-desc">
+    幫你留意常搭巴士到站時間，少一點等待，多一點安心。
+  </div>
 </div>
 
 <!-- Control Bar -->
 <div class="controlbar">
   <div class="info">
     <div id="date">--</div>
-    <div>最後更新：<span id="lastUpdate">--</span></div>
+    <div>剛剛更新：<strong id="lastUpdate">--</strong></div>
   </div>
 
   <button class="update-btn" id="updateBtn" onclick="manualUpdate()">
-    即時更新巴士資料
+    重新看看巴士
   </button>
 </div>
 
 <!-- Main Panel -->
 <div class="panel">
+  <div class="section-title">下一班回家的車</div>
+
   <div class="bus-list" id="busList">
-    <div class="message">正在載入巴士資料...</div>
+    <div class="message">正在幫你看看巴士幾時到...</div>
   </div>
 </div>
 
 <!-- Bottom Bar -->
 <div class="bottombar">
-  <div>每 15 秒自動更新一次</div>
+  <div>資料來源：<span>九巴 KMB ETA</span></div>
+  <div>每 15 秒自動幫你更新一次</div>
 </div>
 
 <script>
@@ -315,9 +531,7 @@ const SERVICE_TYPE = "1";
 const ROUTES = [
   {route:"38", dest:"平田", stopId:"C3672D8D28801773"},
   {route:"42C", dest:"藍田", stopId:"C3672D8D28801773"},
-  {route:"40P", dest:"觀塘", stopId:"A7516C49B99EFD78"},
-  {route:"40P", dest:"觀塘", stopId:"A7516C49B99EFD78"},
-  {route:"38", dest:"平田", stopId:"98A42EFF69A579A0"}
+  {route:"40P", dest:"觀塘", stopId:"A7516C49B99EFD78"}
 
   /*
   新增路線例子：
@@ -381,8 +595,28 @@ function cleanStationName(name){
 
 function getEtaText(value){
   if(value === "--") return "--";
-  if(value === 0) return "即到";
+  if(value === 0) return "快到";
   return `${value} 分鐘`;
+}
+
+function getWarmStatus(m1){
+  if(m1 === "--"){
+    return "暫時未有到站時間";
+  }
+
+  if(m1 === 0){
+    return "快到啦，準備出發";
+  }
+
+  if(m1 <= 3){
+    return "差不多到，可以行去車站";
+  }
+
+  if(m1 <= 8){
+    return "時間剛好，慢慢準備";
+  }
+
+  return "仲有少少時間，唔使急";
 }
 
 function render(){
@@ -390,7 +624,7 @@ function render(){
   list.innerHTML = "";
 
   if(ROUTES.length === 0){
-    list.innerHTML = `<div class="message">尚未設定路線</div>`;
+    list.innerHTML = `<div class="message">你仲未設定回家路線</div>`;
     return;
   }
 
@@ -403,20 +637,18 @@ function render(){
     const m1 = etas[0] ? getMinutes(etas[0]) : "--";
     const m2 = etas[1] ? getMinutes(etas[1]) : "--";
 
-    let statusText = "正常候車";
     let urgentClass = "";
     let boxClass = "route-box";
 
     if(m1 === 0){
-      statusText = "即將到站";
       urgentClass = "urgent";
       boxClass += " urgent-box";
     }else if(m1 !== "--" && m1 <= 3){
-      statusText = "快到站";
       urgentClass = "urgent";
     }
 
     const station = cleanStationName(stopNames[r.stopId] || "--");
+    const statusText = getWarmStatus(m1);
 
     card.innerHTML = `
       <div class="${boxClass}">
@@ -424,16 +656,19 @@ function render(){
       </div>
 
       <div class="bus-main">
-        <div class="destination">往 ${r.dest}</div>
+        <div class="destination">
+          往 <span class="home-word">${r.dest}</span>
+        </div>
         <div class="station">${station}</div>
       </div>
 
       <div class="eta-box">
+        <div class="eta-label">下一班</div>
         <div class="next-time ${urgentClass}">
           ${getEtaText(m1)}
         </div>
         <div class="second-time">
-          下班：${getEtaText(m2)}
+          再下一班：${getEtaText(m2)}
         </div>
         <div class="status ${urgentClass}">
           ${statusText}
@@ -452,7 +687,7 @@ async function fetchETA(){
 
   const btn = document.getElementById("updateBtn");
   btn.disabled = true;
-  btn.innerText = "更新中...";
+  btn.innerText = "幫你更新中...";
 
   for(const r of ROUTES){
     await fetchStopName(r.stopId);
@@ -488,7 +723,7 @@ async function fetchETA(){
   render();
 
   btn.disabled = false;
-  btn.innerText = "即時更新巴士資料";
+  btn.innerText = "重新看看巴士";
 
   isUpdating = false;
 }
