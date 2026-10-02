@@ -62,6 +62,38 @@ html,body{
   min-width:0;
 }
 
+/* ===== Logo as Update Button ===== */
+.logo-btn{
+  border:0;
+  padding:0;
+  margin:0;
+  background:transparent;
+  cursor:pointer;
+  border-radius:12px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-shrink:0;
+}
+
+.logo-btn:hover .logo{
+  transform:scale(1.06) rotate(-4deg);
+  box-shadow:0 6px 16px rgba(31,82,107,0.18);
+}
+
+.logo-btn:active .logo{
+  transform:scale(0.94) rotate(8deg);
+}
+
+.logo-btn:disabled{
+  cursor:not-allowed;
+  opacity:0.7;
+}
+
+.logo-btn.loading .logo{
+  animation:spin 0.8s linear infinite;
+}
+
 .logo{
   width:42px;
   height:42px;
@@ -70,6 +102,7 @@ html,body{
   background:#ffffff;
   box-shadow:0 4px 12px rgba(31,82,107,0.12);
   flex-shrink:0;
+  transition:0.2s ease;
 }
 
 .brand-text{
@@ -121,53 +154,11 @@ html,body{
   white-space:nowrap;
 }
 
-/* ===== Control Bar ===== */
-.controlbar{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:12px;
-  margin:16px 16px 0;
-  padding:14px 16px;
-  background:rgba(255,255,255,0.78);
-  border:1px solid rgba(240,223,201,0.78);
-  border-radius:18px;
-  box-shadow:0 8px 18px rgba(135,98,48,0.08);
-}
-
-.info{
+.update-time{
+  font-size:12px;
   color:var(--muted);
-  font-size:14px;
-  line-height:1.6;
-}
-
-.info strong{
-  color:var(--blue-dark);
-}
-
-.update-btn{
-  border:0;
-  background:linear-gradient(135deg,var(--orange),var(--orange-deep));
-  color:#ffffff;
-  font-weight:900;
-  padding:11px 18px;
-  border-radius:999px;
-  cursor:pointer;
-  font-size:15px;
-  transition:0.2s;
+  font-weight:700;
   white-space:nowrap;
-  box-shadow:0 6px 14px rgba(255,143,63,0.28);
-}
-
-.update-btn:hover{
-  transform:translateY(-1px);
-  box-shadow:0 8px 18px rgba(255,143,63,0.34);
-}
-
-.update-btn:disabled{
-  opacity:0.65;
-  cursor:not-allowed;
-  transform:none;
 }
 
 /* ===== Main ===== */
@@ -370,6 +361,15 @@ html,body{
   100%{box-shadow:0 0 0 rgba(255,107,107,0);}
 }
 
+@keyframes spin{
+  from{
+    transform:rotate(0deg);
+  }
+  to{
+    transform:rotate(360deg);
+  }
+}
+
 /* ===== Mobile ===== */
 @media(max-width:600px){
   .topbar{
@@ -381,6 +381,10 @@ html,body{
   .logo{
     width:38px;
     height:38px;
+    border-radius:10px;
+  }
+
+  .logo-btn{
     border-radius:10px;
   }
 
@@ -405,14 +409,8 @@ html,body{
     font-size:12px;
   }
 
-  .controlbar{
-    margin:12px 12px 0;
-    align-items:flex-start;
-    flex-direction:column;
-  }
-
-  .update-btn{
-    width:100%;
+  .update-time{
+    font-size:11px;
   }
 
   .panel{
@@ -462,7 +460,10 @@ html,body{
 <!-- Top Bar -->
 <div class="topbar">
   <div class="brand">
-    <img class="logo" src="icon/icon.png" alt="回家巴士 Logo">
+    <button class="logo-btn" id="updateBtn" onclick="manualUpdate()" aria-label="更新巴士到站時間" title="更新巴士到站時間">
+      <img class="logo" src="icon/icon.png" alt="回家巴士 Logo">
+    </button>
+
     <div class="brand-text">
       <div class="title">回家巴士</div>
       <div class="subtitle">陪你睇住下一班歸家的車</div>
@@ -477,16 +478,9 @@ html,body{
       天氣：大雨 · 23°C
     </div>
     <div class="update-time" id="updateTime">
-    剛剛更新：<span id="lastUpdate">--</span>
+      剛剛更新：<span id="lastUpdate">--</span>
     </div>
-    </div>
-</div>
-
-<!-- Control Bar -->
-<div class="controlbar">
-  <button class="update-btn" id="updateBtn" onclick="manualUpdate()">
-    重新看看巴士
-  </button>
+  </div>
 </div>
 
 <!-- Main Panel -->
@@ -509,9 +503,7 @@ html,body{
 </div>
 
 <!-- Bottom Bar -->
-<div class="bottombar">
-  <div>每 5 秒自動幫你更新一次</div>
-</div>
+
 
 <script>
 const SERVICE_TYPE = "1";
@@ -574,18 +566,6 @@ let isUpdating = false;
 
 function updateTopInfo(){
   const now = new Date();
-
-  document.getElementById("dateText").innerText =
-    now.toLocaleDateString("zh-HK", {
-      year:"numeric",
-      month:"2-digit",
-      day:"2-digit",
-      weekday:"short"
-    }).replace(/\//g,"年").replace("年", "年").replace("年", "年");
-
-  /*
-    上面瀏覽器格式未必完全一致，所以用手動格式化更穩定。
-  */
 
   const weekdays = ["週日","週一","週二","週三","週四","週五","週六"];
   const y = now.getFullYear();
@@ -709,7 +689,7 @@ async function fetchETA(){
 
   const btn = document.getElementById("updateBtn");
   btn.disabled = true;
-  btn.innerText = "幫你更新中...";
+  btn.classList.add("loading");
 
   for(const group of ROUTE_GROUPS){
     for(const r of group.routes){
@@ -752,7 +732,7 @@ async function fetchETA(){
   render();
 
   btn.disabled = false;
-  btn.innerText = "重新看看巴士";
+  btn.classList.remove("loading");
 
   isUpdating = false;
 }
