@@ -38,7 +38,7 @@ html,body{
 
 /* ===== Top Bar ===== */
 .topbar{
-  background:rgba(255,255,255,0.82);
+  background:rgba(255,255,255,0.84);
   backdrop-filter:blur(12px);
   -webkit-backdrop-filter:blur(12px);
   color:var(--text);
@@ -95,47 +95,30 @@ html,body{
   text-overflow:ellipsis;
 }
 
-.clock-wrap{
+.top-info{
   text-align:right;
   flex-shrink:0;
+  display:flex;
+  flex-direction:column;
+  gap:4px;
 }
 
-.clock{
-  font-size:30px;
-  letter-spacing:1px;
-  color:var(--blue-dark);
-}
-
-.clock-label{
-  font-size:12px;
-  color:var(--muted);
-  font-weight:600;
-  margin-top:2px;
-}
-
-/* ===== Welcome Card ===== */
-.hero{
-  margin:16px 16px 0;
-  padding:18px;
-  border-radius:22px;
-  background:
-    linear-gradient(135deg,rgba(255,255,255,0.9),rgba(223,245,255,0.88)),
-    linear-gradient(135deg,var(--cream),var(--sky));
-  border:1px solid rgba(240,223,201,0.75);
-  box-shadow:0 10px 24px var(--shadow);
-}
-
-.hero-title{
-  font-size:22px;
-  font-weight:900;
-  color:var(--blue-dark);
-  margin-bottom:6px;
-}
-
-.hero-desc{
-  color:var(--muted);
+.date-update{
   font-size:14px;
-  line-height:1.6;
+  color:var(--blue-dark);
+  font-weight:900;
+  white-space:nowrap;
+}
+
+.date-update span{
+  color:var(--orange-deep);
+}
+
+.weather-line{
+  font-size:13px;
+  color:var(--muted);
+  font-weight:700;
+  white-space:nowrap;
 }
 
 /* ===== Control Bar ===== */
@@ -144,7 +127,7 @@ html,body{
   justify-content:space-between;
   align-items:center;
   gap:12px;
-  margin:14px 16px 0;
+  margin:16px 16px 0;
   padding:14px 16px;
   background:rgba(255,255,255,0.78);
   border:1px solid rgba(240,223,201,0.78);
@@ -192,11 +175,26 @@ html,body{
   padding:16px;
 }
 
+.route-group{
+  margin-bottom:20px;
+}
+
 .section-title{
-  font-size:16px;
-  font-weight:900;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:17px;
+  font-weight:950;
   color:var(--blue-dark);
-  margin:2px 2px 12px;
+  margin:4px 2px 12px;
+}
+
+.section-title::before{
+  content:"";
+  width:9px;
+  height:24px;
+  background:linear-gradient(180deg,var(--orange),var(--sky-deep));
+  border-radius:999px;
 }
 
 .bus-list{
@@ -337,9 +335,9 @@ html,body{
 .bottombar{
   color:var(--muted);
   font-size:13px;
-  padding:4px 18px 24px;
+  padding:0 18px 24px;
   display:flex;
-  justify-content:space-between;
+  justify-content:flex-end;
   gap:12px;
   flex-wrap:wrap;
 }
@@ -377,6 +375,7 @@ html,body{
   .topbar{
     padding:12px 14px;
     gap:10px;
+    align-items:flex-start;
   }
 
   .logo{
@@ -391,25 +390,19 @@ html,body{
 
   .subtitle{
     font-size:12px;
-    max-width:150px;
+    max-width:145px;
   }
 
-  .clock{
-    font-size:25px;
+  .top-info{
+    gap:3px;
   }
 
-  .clock-label{
-    display:none;
+  .date-update{
+    font-size:12px;
   }
 
-  .hero{
-    margin:14px 12px 0;
-    padding:16px;
-    border-radius:20px;
-  }
-
-  .hero-title{
-    font-size:20px;
+  .weather-line{
+    font-size:12px;
   }
 
   .controlbar{
@@ -476,25 +469,22 @@ html,body{
     </div>
   </div>
 
-  <div class="clock-wrap">
-    <div class="clock" id="clock">--:--</div>
-    <div class="clock-label">而家時間</div>
-  </div>
-</div>
-
-<!-- Welcome -->
-<div class="hero">
-  <div class="hero-title">準備返屋企啦</div>
-  <div class="hero-desc">
-    幫你留意常搭巴士到站時間，少一點等待，多一點安心。
+  <div class="top-info">
+    <div class="date-update">
+      <span id="dateText">2026年10月02日 週五</span>
+      · 剛剛更新：<span id="lastUpdate">--</span>
+    </div>
+    <div class="weather-line" id="weatherText">
+      天氣：大雨 · 23°C
+    </div>
   </div>
 </div>
 
 <!-- Control Bar -->
 <div class="controlbar">
   <div class="info">
-    <div id="date">--</div>
-    <div>剛剛更新：<strong id="lastUpdate">--</strong></div>
+    <div>少一點等待，多一點安心。</div>
+    <div>自動幫你留意下一班回家的巴士。</div>
   </div>
 
   <button class="update-btn" id="updateBtn" onclick="manualUpdate()">
@@ -504,16 +494,25 @@ html,body{
 
 <!-- Main Panel -->
 <div class="panel">
-  <div class="section-title">下一班回家的車</div>
 
-  <div class="bus-list" id="busList">
-    <div class="message">正在幫你看看巴士幾時到...</div>
+  <div class="route-group">
+    <div class="section-title">返蘇屋邨</div>
+    <div class="bus-list" id="busList-SO-UK">
+      <div class="message">正在幫你看看返蘇屋邨嘅巴士...</div>
+    </div>
   </div>
+
+  <div class="route-group">
+    <div class="section-title">返怡峰苑</div>
+    <div class="bus-list" id="busList-YI-FUNG">
+      <div class="message">正在幫你看看返怡峰苑嘅巴士...</div>
+    </div>
+  </div>
+
 </div>
 
 <!-- Bottom Bar -->
 <div class="bottombar">
-  <div>資料來源：<span>九巴 KMB ETA</span></div>
   <div>每 15 秒自動幫你更新一次</div>
 </div>
 
@@ -521,48 +520,84 @@ html,body{
 const SERVICE_TYPE = "1";
 
 /*
-  在這裡加入或修改路線。
+  重要：
+  stopId 需要用九巴 API 的巴士站 ID。
+  下面 stopNameText 會按你要求顯示指定上車站文字。
 
-  route  = 巴士路線
-  dest   = 目的地關鍵字，必須和九巴 API 目的地文字部分相同
-  stopId = 巴士站 ID
+  如果 ETA 未能顯示，通常是 stopId 需要改成正確的站 ID。
 */
 
-const ROUTES = [
-  {route:"38", dest:"平田", stopId:"C3672D8D28801773"},
-  {route:"42C", dest:"藍田", stopId:"C3672D8D28801773"},
-  {route:"40P", dest:"觀塘", stopId:"A7516C49B99EFD78"}
-
-  /*
-  新增路線例子：
-
-  ,{route:"89D", dest:"烏溪沙站", stopId:"XXXXXXXXXXXXXXX"}
-  ,{route:"74X", dest:"大埔中心", stopId:"XXXXXXXXXXXXXXX"}
-  ,{route:"277X", dest:"聯和墟", stopId:"XXXXXXXXXXXXXXX"}
-  */
+const ROUTE_GROUPS = [
+  {
+    id:"SO-UK",
+    title:"返蘇屋邨",
+    routes:[
+      {
+        route:"31B",
+        dest:"奧運站",
+        stopNameText:"葵涌業成街",
+        stopId:"C3672D8D28801773"
+      },
+      {
+        route:"36B",
+        dest:"高鐵(西九龍站)",
+        stopNameText:"葵涌業成街",
+        stopId:"C3672D8D28801773"
+      },
+      {
+        route:"35A",
+        dest:"尖沙咀東",
+        stopNameText:"石籬邨石俊樓",
+        stopId:"A7516C49B99EFD78"
+      },
+      {
+        route:"37",
+        dest:"奧運站",
+        stopNameText:"葵盛(中)",
+        stopId:"98A42EFF69A579A0"
+      }
+    ]
+  },
+  {
+    id:"YI-FUNG",
+    title:"返怡峰苑",
+    routes:[
+      {
+        route:"38",
+        dest:"平田",
+        stopNameText:"葵盛(東)",
+        stopId:"7CB0618D76B5F553"
+      }
+    ]
+  }
 ];
 
 let etaData = {};
-let stopNames = {};
 let isUpdating = false;
 
-function updateClock(){
+function updateTopInfo(){
   const now = new Date();
 
-  document.getElementById("clock").innerText =
-    now.toLocaleTimeString("zh-HK", {
-      hour:"2-digit",
-      minute:"2-digit",
-      hour12:false
-    });
-
-  document.getElementById("date").innerText =
+  document.getElementById("dateText").innerText =
     now.toLocaleDateString("zh-HK", {
-      weekday:"short",
       year:"numeric",
-      month:"short",
-      day:"2-digit"
-    });
+      month:"2-digit",
+      day:"2-digit",
+      weekday:"short"
+    }).replace(/\//g,"年").replace("年", "年").replace("年", "年");
+
+  /*
+    上面瀏覽器格式未必完全一致，所以用手動格式化更穩定。
+  */
+
+  const weekdays = ["週日","週一","週二","週三","週四","週五","週六"];
+  const y = now.getFullYear();
+  const m = String(now.getMonth() + 1).padStart(2,"0");
+  const d = String(now.getDate()).padStart(2,"0");
+  const w = weekdays[now.getDay()];
+
+  document.getElementById("dateText").innerText =
+    `${y}年${m}月${d}日 ${w}`;
 }
 
 function getMinutes(t){
@@ -573,24 +608,6 @@ function getMinutes(t){
   if(diff < 0) return 0;
 
   return diff;
-}
-
-async function fetchStopName(stopId){
-  if(stopNames[stopId]) return;
-
-  try{
-    const res = await fetch(`https://data.etabus.gov.hk/v1/transport/kmb/stop/${stopId}`);
-    const data = await res.json();
-
-    stopNames[stopId] = data.data.name_tc || "--";
-  }catch(error){
-    stopNames[stopId] = "--";
-  }
-}
-
-function cleanStationName(name){
-  if(!name) return "--";
-  return name.replace(/\s*\(.*?\)/g,"");
 }
 
 function getEtaText(value){
@@ -619,20 +636,25 @@ function getWarmStatus(m1){
   return "仲有少少時間，唔使急";
 }
 
-function render(){
-  const list = document.getElementById("busList");
+function getEtaKey(r){
+  return `${r.route}_${r.dest}_${r.stopNameText}`;
+}
+
+function renderGroup(group){
+  const list = document.getElementById(`busList-${group.id}`);
   list.innerHTML = "";
 
-  if(ROUTES.length === 0){
-    list.innerHTML = `<div class="message">你仲未設定回家路線</div>`;
+  if(group.routes.length === 0){
+    list.innerHTML = `<div class="message">呢組暫時未有巴士路線</div>`;
     return;
   }
 
-  ROUTES.forEach(r => {
+  group.routes.forEach(r => {
     const card = document.createElement("div");
     card.className = "bus-card";
 
-    const etas = etaData[r.route] || [];
+    const key = getEtaKey(r);
+    const etas = etaData[key] || [];
 
     const m1 = etas[0] ? getMinutes(etas[0]) : "--";
     const m2 = etas[1] ? getMinutes(etas[1]) : "--";
@@ -647,7 +669,6 @@ function render(){
       urgentClass = "urgent";
     }
 
-    const station = cleanStationName(stopNames[r.stopId] || "--");
     const statusText = getWarmStatus(m1);
 
     card.innerHTML = `
@@ -659,7 +680,7 @@ function render(){
         <div class="destination">
           往 <span class="home-word">${r.dest}</span>
         </div>
-        <div class="station">${station}</div>
+        <div class="station">${r.stopNameText}</div>
       </div>
 
       <div class="eta-box">
@@ -680,6 +701,10 @@ function render(){
   });
 }
 
+function render(){
+  ROUTE_GROUPS.forEach(group => renderGroup(group));
+}
+
 async function fetchETA(){
   if(isUpdating) return;
 
@@ -689,26 +714,33 @@ async function fetchETA(){
   btn.disabled = true;
   btn.innerText = "幫你更新中...";
 
-  for(const r of ROUTES){
-    await fetchStopName(r.stopId);
+  for(const group of ROUTE_GROUPS){
+    for(const r of group.routes){
+      const key = getEtaKey(r);
 
-    try{
-      const res = await fetch(
-        `https://data.etabus.gov.hk/v1/transport/kmb/eta/${r.stopId}/${r.route}/${SERVICE_TYPE}`
-      );
+      if(!r.stopId){
+        etaData[key] = [];
+        continue;
+      }
 
-      const data = await res.json();
+      try{
+        const res = await fetch(
+          `https://data.etabus.gov.hk/v1/transport/kmb/eta/${r.stopId}/${r.route}/${SERVICE_TYPE}`
+        );
 
-      const filtered = data.data.filter(x => {
-        return x.dest_tc && x.dest_tc.includes(r.dest);
-      });
+        const data = await res.json();
 
-      etaData[r.route] = filtered
-        .slice(0,2)
-        .map(x => x.eta);
+        const filtered = data.data.filter(x => {
+          return x.dest_tc && x.dest_tc.includes(r.dest);
+        });
 
-    }catch(error){
-      etaData[r.route] = [];
+        etaData[key] = filtered
+          .slice(0,2)
+          .map(x => x.eta);
+
+      }catch(error){
+        etaData[key] = [];
+      }
     }
   }
 
@@ -733,12 +765,12 @@ function manualUpdate(){
 }
 
 /* Initial Load */
-updateClock();
+updateTopInfo();
 render();
 fetchETA();
 
 /* Auto Update */
-setInterval(updateClock, 1000);
+setInterval(updateTopInfo, 1000);
 setInterval(fetchETA, 15000);
 </script>
 
