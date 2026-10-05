@@ -261,6 +261,46 @@ html,body{
   color:var(--orange-deep);
 }
 
+/* ===== Stop Tabs ===== */
+.stop-tabs{
+  display:flex;
+  gap:8px;
+  overflow-x:auto;
+  padding:4px 0 8px;
+  margin-top:4px;
+  scrollbar-width:none;
+}
+
+.stop-tabs::-webkit-scrollbar{
+  display:none;
+}
+
+.stop-tab{
+  border:1px solid rgba(240,223,201,0.95);
+  background:rgba(255,255,255,0.78);
+  color:var(--blue-dark);
+  border-radius:999px;
+  padding:7px 12px;
+  font-size:13px;
+  font-weight:850;
+  white-space:nowrap;
+  cursor:pointer;
+  flex-shrink:0;
+  transition:0.18s ease;
+}
+
+.stop-tab:hover{
+  background:rgba(223,245,255,0.95);
+  transform:translateY(-1px);
+}
+
+.stop-tab.active{
+  background:linear-gradient(135deg,var(--orange),var(--orange-deep));
+  color:#fff;
+  border-color:transparent;
+  box-shadow:0 4px 12px rgba(255,143,63,0.25);
+}
+
 .station{
   font-size:14px;
   color:var(--muted);
@@ -430,7 +470,7 @@ html,body{
     grid-area:route;
     width:74px;
     height:100%;
-    min-height:106px;
+    min-height:122px;
     font-size:28px;
   }
 
@@ -450,6 +490,15 @@ html,body{
 
   .destination{
     font-size:18px;
+  }
+
+  .stop-tabs{
+    padding-bottom:8px;
+  }
+
+  .stop-tab{
+    font-size:12px;
+    padding:6px 10px;
   }
 }
 </style>
@@ -502,18 +551,14 @@ html,body{
 
 </div>
 
-<!-- Bottom Bar -->
-
-
 <script>
 const SERVICE_TYPE = "1";
 
 /*
-  重要：
-  stopId 需要用九巴 API 的巴士站 ID。
-  下面 stopNameText 會按你要求顯示指定上車站文字。
-
-  如果 ETA 未能顯示，通常是 stopId 需要改成正確的站 ID。
+  保留你現有的巴士站資料。
+  這裡仍然用你原本的 route / dest / stopNameText / stopId。
+  顯示時會自動將相同 route + dest 合併成一張卡，
+  如果之後同一路線加入多個不同上車站，就會以 Tabs 顯示。
 */
 
 const ROUTE_GROUPS = [
@@ -540,6 +585,12 @@ const ROUTE_GROUPS = [
         stopId:"A7516C49B99EFD78"
       },
       {
+        route:"35A",
+        dest:"尖沙咀東",
+        stopNameText:"葵涌業成街",
+        stopId:"C3672D8D28801773"
+      },
+      {
         route:"37",
         dest:"奧運站",
         stopNameText:"葵盛(中)",
@@ -563,6 +614,31 @@ const ROUTE_GROUPS = [
 
 let etaData = {};
 let isUpdating = false;
+let selectedStops = {};
+
+/* 將原本 flat routes 自動整理成 Tabs 用的結構 */
+function normalizeRoutes(routes){
+  const map = {};
+
+  routes.forEach(r => {
+    const routeKey = getRouteKey(r);
+
+    if(!map[routeKey]){
+      map[routeKey] = {
+        route:r.route,
+        dest:r.dest,
+        stops:[]
+      };
+    }
+
+    map[routeKey].stops.push({
+      stopNameText:r.stopNameText,
+      stopId:r.stopId
+    });
+  });
+
+  return Object.values(map);
+}
 
 function updateTopInfo(){
   const now = new Date();
@@ -613,24 +689,50 @@ function getWarmStatus(m1){
   return "仲有少少時間，唔使急";
 }
 
-function getEtaKey(r){
-  return `${r.route}_${r.dest}_${r.stopNameText}`;
+function getRouteKey(r){
+  return `${r.route}_${r.dest}`;
+}
+
+function getEtaKey(r, stop){
+  return `${r.route}_${r.dest}_${stop.stopNameText}`;
+}
+
+function selectStop(routeKey, stopIndex){
+  selectedStops[routeKey] = stopIndex;
+  render();
 }
 
 function renderGroup(group){
   const list = document.getElementById(`busList-${group.id}`);
   list.innerHTML = "";
 
-  if(group.routes.length === 0){
+  const normalizedRoutes = normalizeRoutes(group.routes);
+
+  if(normalizedRoutes.length === 0){
     list.innerHTML = `<div class="message">呢組暫時未有巴士路線</div>`;
     return;
   }
 
-  group.routes.forEach(r => {
+  normalizedRoutes.forEach(r => {
     const card = document.createElement("div");
     card.className = "bus-card";
 
-    const key = getEtaKey(r);
+    const routeKey = getRouteKey(r);
+
+    if(selectedStops[routeKey] === undefined){
+      selectedStops[routeKey] = 0;
+    }
+
+    let selectedIndex = selectedStops[routeKey];
+
+    if(selectedIndex >= r.stops.length){
+      selectedIndex = 0;
+      selectedStops[routeKey] = 0;
+    }
+
+    const selectedStop = r.stops[selectedIndex];
+
+    const key = getEtaKey(r, selectedStop);
     const etas = etaData[key] || [];
 
     const m1 = etas[0] ? getMinutes(etas[0]) : "--";
@@ -648,6 +750,20 @@ function renderGroup(group){
 
     const statusText = getWarmStatus(m1);
 
+    const tabsHtml = r.stops.map((stop, index) => {
+      const activeClass = index === selectedIndex ? "active" : "";
+
+      return `
+        <button
+          type="button"
+          class="stop-tab ${activeClass}"
+          onclick="selectStop('${routeKey}', ${index})"
+        >
+          ${stop.stopNameText}
+        </button>
+      `;
+    }).join("");
+
     card.innerHTML = `
       <div class="${boxClass}">
         ${r.route}
@@ -657,7 +773,12 @@ function renderGroup(group){
         <div class="destination">
           往 <span class="home-word">${r.dest}</span>
         </div>
-        <div class="station">${r.stopNameText}</div>
+
+        <div class="stop-tabs">
+          ${tabsHtml}
+        </div>
+
+        <div class="station">${selectedStop.stopNameText}</div>
       </div>
 
       <div class="eta-box">
@@ -693,7 +814,17 @@ async function fetchETA(){
 
   for(const group of ROUTE_GROUPS){
     for(const r of group.routes){
-      const key = getEtaKey(r);
+      const routeForKey = {
+        route:r.route,
+        dest:r.dest
+      };
+
+      const stop = {
+        stopNameText:r.stopNameText,
+        stopId:r.stopId
+      };
+
+      const key = getEtaKey(routeForKey, stop);
 
       if(!r.stopId){
         etaData[key] = [];
