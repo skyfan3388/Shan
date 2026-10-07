@@ -318,7 +318,7 @@ html,body{
   position:relative;
   z-index:1;
   text-align:right;
-  min-width:105px;
+  min-width:125px;
 }
 
 .eta-label{
@@ -344,6 +344,26 @@ html,body{
   margin-top:5px;
   color:var(--muted);
   font-size:14px;
+}
+
+.company-tag{
+  display:inline-block;
+  font-size:11px;
+  font-weight:900;
+  color:#ffffff;
+  background:var(--blue);
+  border-radius:999px;
+  padding:2px 6px;
+  margin-right:4px;
+  vertical-align:middle;
+}
+
+.company-tag.ctb{
+  background:#f05a28;
+}
+
+.company-tag.kmb{
+  background:#d71920;
 }
 
 .status{
@@ -555,10 +575,23 @@ html,body{
 const SERVICE_TYPE = "1";
 
 /*
-  保留你現有的巴士站資料。
-  這裡仍然用你原本的 route / dest / stopNameText / stopId。
-  顯示時會自動將相同 route + dest 合併成一張卡，
-  如果之後同一路線加入多個不同上車站，就會以 Tabs 顯示。
+  已加入 company / providers 支援。
+
+  用法一：普通九巴路線
+  company:"kmb"
+
+  用法二：城巴路線
+  company:"ctb"
+
+  用法三：同一路線同一站同時查九巴 + 城巴
+  providers:[
+    { company:"kmb", stopId:"九巴站 ID" },
+    { company:"ctb", stopId:"城巴站 ID" }
+  ]
+
+  注意：
+  你現有 stopId 全部係九巴 stopId。
+  城巴 API 一定要用城巴自己的 stopId。
 */
 
 const ROUTE_GROUPS = [
@@ -567,46 +600,109 @@ const ROUTE_GROUPS = [
     title:"返蘇屋邨",
     routes:[
       {
+        company:"kmb",
         route:"31B",
         dest:"奧運站",
         stopNameText:"葵涌業成街",
         stopId:"C3672D8D28801773"
       },
       {
+        company:"kmb",
         route:"36B",
         dest:"高鐵(西九龍站)",
         stopNameText:"葵涌業成街",
         stopId:"C3672D8D28801773"
       },
       {
+        company:"kmb",
         route:"35A",
         dest:"尖沙咀東",
         stopNameText:"石籬邨石俊樓",
         stopId:"A7516C49B99EFD78"
       },
       {
+        company:"kmb",
         route:"35A",
         dest:"尖沙咀東",
         stopNameText:"葵涌業成街",
         stopId:"C3672D8D28801773"
       },
       {
+        company:"kmb",
         route:"37",
         dest:"奧運站",
         stopNameText:"葵盛(中)",
         stopId:"98A42EFF69A579A0"
       },
+
+      /*
+        112 係聯營線。
+        你原本呢個 stopId 係九巴 stopId。
+        請將 ctbStopId 填成城巴的「山東街 朗豪坊」stopId。
+      */
       {
         route:"112",
         dest:"長沙灣(蘇屋邨)",
         stopNameText:"山東街 朗豪坊",
-        stopId:"8552E415E0C7B113"
+        providers:[
+          {
+            company:"kmb",
+            stopId:"8552E415E0C7B113",
+            serviceType:"1"
+          },
+          {
+            company:"ctb",
+            stopId:""
+          }
+        ]
       },
+
+      /*
+        112 深水埗楓樹街。
+        請將 ctbStopId 填成城巴的「深水埗 楓樹街」stopId。
+      */
       {
         route:"112",
         dest:"長沙灣(蘇屋邨)",
         stopNameText:"深水埗 楓樹街",
-        stopId:"1A85A6C132C4197F"
+        providers:[
+          {
+            company:"kmb",
+            stopId:"1A85A6C132C4197F",
+            serviceType:"1"
+          },
+          {
+            company:"ctb",
+            stopId:""
+          }
+        ]
+      },
+
+      /*
+        793 及 970 多數用城巴 / 新巴 API 資料。
+        你原本 stopId 似係九巴站 ID，所以如果查唔到係正常。
+        請填入城巴 stopId。
+      */
+      {
+        company:"ctb",
+        route:"793",
+        dest:"長沙灣(蘇屋邨)",
+        stopNameText:"深水埗 楓樹街",
+        stopId:""
+      },
+      {
+        company:"ctb",
+        route:"970",
+        dest:"長沙灣(蘇屋邨)",
+        stopNameText:"山東街 朗豪坊",
+        stopId:""
+      },
+      {
+        company:"ctb",
+        route:"970",
+        dest:"長沙灣(蘇屋邨)",
+        stopNameText:"深水埗 楓樹街",
+        stopId:""
       }
     ]
   },
@@ -615,6 +711,7 @@ const ROUTE_GROUPS = [
     title:"返怡峰苑",
     routes:[
       {
+        company:"kmb",
         route:"38",
         dest:"平田",
         stopNameText:"葵盛(東)",
@@ -645,11 +742,33 @@ function normalizeRoutes(routes){
 
     map[routeKey].stops.push({
       stopNameText:r.stopNameText,
-      stopId:r.stopId
+      stopId:r.stopId || "",
+      company:r.company || "",
+      providers:getProvidersFromRoute(r)
     });
   });
 
   return Object.values(map);
+}
+
+function getProvidersFromRoute(r){
+  if(Array.isArray(r.providers)){
+    return r.providers
+      .filter(p => p && p.company)
+      .map(p => ({
+        company:p.company,
+        stopId:p.stopId || "",
+        serviceType:p.serviceType || SERVICE_TYPE
+      }));
+  }
+
+  return [
+    {
+      company:r.company || "kmb",
+      stopId:r.stopId || "",
+      serviceType:r.serviceType || SERVICE_TYPE
+    }
+  ];
 }
 
 function updateTopInfo(){
@@ -709,6 +828,18 @@ function getEtaKey(r, stop){
   return `${r.route}_${r.dest}_${stop.stopNameText}`;
 }
 
+function companyLabel(company){
+  if(company === "kmb") return "九巴";
+  if(company === "ctb") return "城巴";
+  return company || "";
+}
+
+function companyClass(company){
+  if(company === "kmb") return "kmb";
+  if(company === "ctb") return "ctb";
+  return "";
+}
+
 function selectStop(routeKey, stopIndex){
   selectedStops[routeKey] = stopIndex;
   render();
@@ -747,8 +878,11 @@ function renderGroup(group){
     const key = getEtaKey(r, selectedStop);
     const etas = etaData[key] || [];
 
-    const m1 = etas[0] ? getMinutes(etas[0]) : "--";
-    const m2 = etas[1] ? getMinutes(etas[1]) : "--";
+    const firstEta = etas[0] || null;
+    const secondEta = etas[1] || null;
+
+    const m1 = firstEta ? getMinutes(firstEta.eta) : "--";
+    const m2 = secondEta ? getMinutes(secondEta.eta) : "--";
 
     let urgentClass = "";
     let boxClass = "route-box";
@@ -776,6 +910,14 @@ function renderGroup(group){
       `;
     }).join("");
 
+    const firstCompanyHtml = firstEta
+      ? `<span class="company-tag ${companyClass(firstEta.company)}">${companyLabel(firstEta.company)}</span>`
+      : "";
+
+    const secondCompanyHtml = secondEta
+      ? `<span class="company-tag ${companyClass(secondEta.company)}">${companyLabel(secondEta.company)}</span>`
+      : "";
+
     card.innerHTML = `
       <div class="${boxClass}">
         ${r.route}
@@ -796,10 +938,10 @@ function renderGroup(group){
       <div class="eta-box">
         <div class="eta-label">下一班</div>
         <div class="next-time ${urgentClass}">
-          ${getEtaText(m1)}
+          ${firstCompanyHtml}${getEtaText(m1)}
         </div>
         <div class="second-time">
-          再下一班：${getEtaText(m2)}
+          再下一班：${secondCompanyHtml}${getEtaText(m2)}
         </div>
         <div class="status ${urgentClass}">
           ${statusText}
@@ -813,6 +955,79 @@ function renderGroup(group){
 
 function render(){
   ROUTE_GROUPS.forEach(group => renderGroup(group));
+}
+
+function getEtaUrl(provider, route){
+  if(provider.company === "kmb"){
+    return `https://data.etabus.gov.hk/v1/transport/kmb/eta/${provider.stopId}/${route}/${provider.serviceType || SERVICE_TYPE}`;
+  }
+
+  if(provider.company === "ctb"){
+    return `https://rt.data.gov.hk/v2/transport/citybus/eta/CTB/${provider.stopId}/${route}`;
+  }
+
+  return "";
+}
+
+function normalizeDestText(text){
+  return String(text || "")
+    .replace(/\s/g, "")
+    .replace("（", "(")
+    .replace("）", ")");
+}
+
+function isSameDestination(apiDest, targetDest){
+  const a = normalizeDestText(apiDest);
+  const b = normalizeDestText(targetDest);
+
+  if(!a || !b) return false;
+
+  if(a.includes(b)) return true;
+  if(b.includes(a)) return true;
+
+  /*
+    特別處理：
+    你畫面想顯示「長沙灣(蘇屋邨)」，
+    但 API 有機會只寫「蘇屋」或「長沙灣」。
+  */
+  if(b.includes("蘇屋") && a.includes("蘇屋")) return true;
+  if(b.includes("長沙灣") && a.includes("長沙灣")) return true;
+
+  return false;
+}
+
+async function fetchEtaFromProvider(route, dest, provider){
+  if(!provider.stopId){
+    return [];
+  }
+
+  const url = getEtaUrl(provider, route);
+
+  if(!url){
+    return [];
+  }
+
+  try{
+    const res = await fetch(url);
+    const data = await res.json();
+
+    const raw = Array.isArray(data.data) ? data.data : [];
+
+    return raw
+      .filter(x => {
+        return x && x.eta && isSameDestination(x.dest_tc, dest);
+      })
+      .map(x => ({
+        eta:x.eta,
+        company:provider.company,
+        dest_tc:x.dest_tc || "",
+        route:x.route || route
+      }));
+
+  }catch(error){
+    console.error("ETA error:", route, provider.company, error);
+    return [];
+  }
 }
 
 async function fetchETA(){
@@ -833,34 +1048,30 @@ async function fetchETA(){
 
       const stop = {
         stopNameText:r.stopNameText,
-        stopId:r.stopId
+        stopId:r.stopId || ""
       };
 
       const key = getEtaKey(routeForKey, stop);
 
-      if(!r.stopId){
-        etaData[key] = [];
-        continue;
-      }
+      const providers = getProvidersFromRoute(r);
 
-      try{
-        const res = await fetch(
-          `https://data.etabus.gov.hk/v1/transport/kmb/eta/${r.stopId}/${r.route}/${SERVICE_TYPE}`
+      let allEtas = [];
+
+      for(const provider of providers){
+        const providerEtas = await fetchEtaFromProvider(
+          r.route,
+          r.dest,
+          provider
         );
 
-        const data = await res.json();
-
-        const filtered = data.data.filter(x => {
-          return x.dest_tc && x.dest_tc.includes(r.dest);
-        });
-
-        etaData[key] = filtered
-          .slice(0,2)
-          .map(x => x.eta);
-
-      }catch(error){
-        etaData[key] = [];
+        allEtas = allEtas.concat(providerEtas);
       }
+
+      allEtas.sort((a,b) => {
+        return new Date(a.eta) - new Date(b.eta);
+      });
+
+      etaData[key] = allEtas.slice(0,2);
     }
   }
 
