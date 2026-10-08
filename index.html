@@ -830,16 +830,22 @@ function getEtaKey(r, stop){
   return `${r.route}_${r.dest}_${stop.stopNameText}`;
 }
 
-function companyLabel(company){
-  if(company === "kmb") return "九巴";
-  if(company === "ctb") return "城巴";
-  return company || "";
+function companyLogo(company){
+  if(company === "kmb"){
+    return "icon/kmb_logo.png";
+  }
+
+  if(company === "ctb"){
+    return "icon/citybus_logo.png";
+  }
+
+  return "";
 }
 
-function companyClass(company){
-  if(company === "kmb") return "kmb";
-  if(company === "ctb") return "ctb";
-  return "";
+function companyAlt(company){
+  if(company === "kmb") return "九巴";
+  if(company === "ctb") return "城巴";
+  return company || "巴士公司";
 }
 
 function selectStop(routeKey, stopIndex){
