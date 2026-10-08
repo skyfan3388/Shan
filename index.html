@@ -918,13 +918,13 @@ function renderGroup(group){
       `;
     }).join("");
 
-    const firstCompanyHtml = firstEta
-      ? `<span class="company-tag ${companyClass(firstEta.company)}">${companyLabel(firstEta.company)}</span>`
-      : "";
+    const firstCompanyHtml = firstEta && companyLogo(firstEta.company)
+  ? `<img class="company-logo" src="${companyLogo(firstEta.company)}" alt="${companyAlt(firstEta.company)}">`
+  : "";
 
-    const secondCompanyHtml = secondEta
-      ? `<span class="company-tag ${companyClass(secondEta.company)}">${companyLabel(secondEta.company)}</span>`
-      : "";
+    const secondCompanyHtml = secondEta && companyLogo(secondEta.company)
+  ? `<img class="company-logo" src="${companyLogo(secondEta.company)}" alt="${companyAlt(secondEta.company)}">`
+  : "";
 
     card.innerHTML = `
       <div class="${boxClass}">
