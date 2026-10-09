@@ -309,11 +309,6 @@ html,body{
   text-overflow:ellipsis;
 }
 
-/*.station::before{
-  content:"上車站：";
-  color:#96a4a9;
-}*/
-
 .eta-box{
   position:relative;
   z-index:1;
@@ -543,10 +538,10 @@ html,body{
 
   <div class="top-info">
     <div class="date-update">
-      <span id="dateText">2026年10月02日 週五</span>
+      <span id="dateText">--</span>
     </div>
     <div class="weather-line" id="weatherText">
-      天氣：大雨 · 23°C
+      天氣：讀取中...
     </div>
     <div class="update-time" id="updateTime">
       剛剛更新：<span id="lastUpdate">--</span>
@@ -577,24 +572,18 @@ html,body{
 const SERVICE_TYPE = "1";
 
 /*
-  已加入 company / providers 支援。
-
-  用法一：普通九巴路線
-  company:"kmb"
-
-  用法二：城巴路線
-  company:"ctb"
-
-  用法三：同一路線同一站同時查九巴 + 城巴
-  providers:[
-    { company:"kmb", stopId:"九巴站 ID" },
-    { company:"ctb", stopId:"城巴站 ID" }
-  ]
-
-  注意：
-  你現有 stopId 全部係九巴 stopId。
-  城巴 API 一定要用城巴自己的 stopId。
+  天氣設定：
+  優先顯示 WEATHER_PLACE 溫度站。
+  如果想用荃灣、沙田、深水埗、黃大仙等，可改下面呢行。
 */
+const WEATHER_PLACE = "香港天文台";
+
+/*
+  香港天文台本港地區天氣報告 API
+  dataType=rhrread = Regional Weather in Hong Kong
+*/
+const HKO_WEATHER_API =
+  "https://data.weather.gov.hk/weatherAPI/opendata/weather.php?dataType=rhrread&lang=tc";
 
 const ROUTE_GROUPS = [
   {
@@ -636,12 +625,6 @@ const ROUTE_GROUPS = [
         stopNameText:"葵盛(中)",
         stopId:"98A42EFF69A579A0"
       },
-
-      /*
-        112 係聯營線。
-        你原本呢個 stopId 係九巴 stopId。
-        請將 ctbStopId 填成城巴的「山東街 朗豪坊」stopId。
-      */
       {
         route:"112",
         dest:"長沙灣(蘇屋邨)",
@@ -658,11 +641,6 @@ const ROUTE_GROUPS = [
           }
         ]
       },
-
-      /*
-        112 深水埗楓樹街。
-        請將 ctbStopId 填成城巴的「深水埗 楓樹街」stopId。
-      */
       {
         route:"112",
         dest:"長沙灣(蘇屋邨)",
@@ -679,12 +657,6 @@ const ROUTE_GROUPS = [
           }
         ]
       },
-
-      /*
-        793 及 970 多數用城巴 / 新巴 API 資料。
-        你原本 stopId 似係九巴站 ID，所以如果查唔到係正常。
-        請填入城巴 stopId。
-      */
       {
         company:"ctb",
         route:"793",
@@ -725,6 +697,7 @@ const ROUTE_GROUPS = [
 
 let etaData = {};
 let isUpdating = false;
+let isWeatherUpdating = false;
 let selectedStops = {};
 
 /* 將原本 flat routes 自動整理成 Tabs 用的結構 */
@@ -784,6 +757,157 @@ function updateTopInfo(){
 
   document.getElementById("dateText").innerText =
     `${y}年${m}月${d}日 ${w}`;
+}
+
+function formatShortTime(dateValue){
+  if(!dateValue) return "";
+
+  const d = new Date(dateValue);
+
+  if(isNaN(d.getTime())){
+    return "";
+  }
+
+  return d.toLocaleTimeString("zh-HK", {
+    hour:"2-digit",
+    minute:"2-digit",
+    hour12:false
+  });
+}
+
+function getWeatherDescription(data){
+  /*
+    HKO rhrread 有時會有 icon，但未必直接有完整天氣文字。
+    如果有 warningMessage / rainfall / icon，可再自訂更仔細顯示。
+    這裡先盡量取現有文字。
+  */
+
+  if(data && Array.isArray(data.warningMessage) && data.warningMessage.length > 0){
+    return data.warningMessage[0];
+  }
+
+  if(data && Array.isArray(data.icon) && data.icon.length > 0){
+    const iconCode = Number(data.icon[0]);
+    return getWeatherTextFromHkoIcon(iconCode);
+  }
+
+  return "--";
+}
+
+function getWeatherTextFromHkoIcon(iconCode){
+  const iconMap = {
+    50:"陽光充沛",
+    51:"間有陽光",
+    52:"短暫陽光",
+    53:"間有陽光 幾陣驟雨",
+    54:"短暫陽光 有驟雨",
+    60:"多雲",
+    61:"密雲",
+    62:"微雨",
+    63:"雨",
+    64:"大雨",
+    65:"雷暴",
+    70:"天晴",
+    71:"天晴",
+    72:"天晴",
+    73:"天晴",
+    74:"天晴",
+    75:"天晴",
+    76:"天晴",
+    77:"天晴",
+    80:"大風",
+    81:"乾燥",
+    82:"潮濕",
+    83:"霧",
+    84:"薄霧",
+    85:"炎熱",
+    90:"熱帶氣旋",
+    91:"熱帶氣旋",
+    92:"熱帶氣旋",
+    93:"熱帶氣旋"
+  };
+
+  return iconMap[iconCode] || "--";
+}
+
+function getSelectedTemperature(data){
+  const temps = data && data.temperature && Array.isArray(data.temperature.data)
+    ? data.temperature.data
+    : [];
+
+  if(temps.length === 0){
+    return null;
+  }
+
+  const preferred = temps.find(item => item.place === WEATHER_PLACE);
+
+  if(preferred){
+    return preferred;
+  }
+
+  const hko = temps.find(item => item.place === "香港天文台");
+
+  if(hko){
+    return hko;
+  }
+
+  return temps[0];
+}
+
+async function fetchWeather(){
+  if(isWeatherUpdating) return;
+
+  isWeatherUpdating = true;
+
+  const weatherText = document.getElementById("weatherText");
+
+  try{
+    const url = `${HKO_WEATHER_API}&_=${Date.now()}`;
+
+    const res = await fetch(url, {
+      cache:"no-store"
+    });
+
+    if(!res.ok){
+      throw new Error(`Weather HTTP ${res.status}`);
+    }
+
+    const data = await res.json();
+
+    const tempItem = getSelectedTemperature(data);
+    const temp = tempItem && tempItem.value !== undefined
+      ? tempItem.value
+      : "--";
+
+    const humidity = data &&
+      data.humidity &&
+      Array.isArray(data.humidity.data) &&
+      data.humidity.data[0] &&
+      data.humidity.data[0].value !== undefined
+        ? data.humidity.data[0].value
+        : "--";
+
+    const weatherDesc = getWeatherDescription(data);
+    const weatherUpdateTime = formatShortTime(data.updateTime);
+
+    let text = `天氣：${weatherDesc} · ${temp}°C`;
+
+    if(humidity !== "--"){
+      text += ` · 濕度 ${humidity}%`;
+    }
+
+    if(weatherUpdateTime){
+      text += ` · ${weatherUpdateTime}`;
+    }
+
+    weatherText.innerText = text;
+
+  }catch(error){
+    console.error("Weather error:", error);
+    weatherText.innerText = "天氣：暫時未能更新";
+  }
+
+  isWeatherUpdating = false;
 }
 
 function getMinutes(t){
@@ -919,12 +1043,12 @@ function renderGroup(group){
     }).join("");
 
     const firstCompanyHtml = firstEta && companyLogo(firstEta.company)
-  ? `<img class="company-logo" src="${companyLogo(firstEta.company)}" alt="${companyAlt(firstEta.company)}">`
-  : "";
+      ? `<img class="company-logo" src="${companyLogo(firstEta.company)}" alt="${companyAlt(firstEta.company)}">`
+      : "";
 
     const secondCompanyHtml = secondEta && companyLogo(secondEta.company)
-  ? `<img class="company-logo" src="${companyLogo(secondEta.company)}" alt="${companyAlt(secondEta.company)}">`
-  : "";
+      ? `<img class="company-logo" src="${companyLogo(secondEta.company)}" alt="${companyAlt(secondEta.company)}">`
+      : "";
 
     card.innerHTML = `
       <div class="${boxClass}">
@@ -939,10 +1063,6 @@ function renderGroup(group){
         <div class="stop-tabs">
           ${tabsHtml}
         </div>
-
-        <!-- <div class="station">${selectedStop.stopNameText}</div> -->
-
-        
       </div>
 
       <div class="eta-box">
@@ -1017,7 +1137,10 @@ async function fetchEtaFromProvider(route, dest, provider){
   }
 
   try{
-    const res = await fetch(url);
+    const res = await fetch(url, {
+      cache:"no-store"
+    });
+
     const data = await res.json();
 
     const raw = Array.isArray(data.data) ? data.data : [];
@@ -1100,18 +1223,28 @@ async function fetchETA(){
   isUpdating = false;
 }
 
-function manualUpdate(){
-  fetchETA();
+async function manualUpdate(){
+  await Promise.all([
+    fetchETA(),
+    fetchWeather()
+  ]);
 }
 
 /* Initial Load */
 updateTopInfo();
 render();
 fetchETA();
+fetchWeather();
 
 /* Auto Update */
 setInterval(updateTopInfo, 1000);
+
+/*
+  巴士 ETA 可以 5 秒更新一次。
+  但天氣資料本身唔會秒秒變，所以 5 分鐘更新一次已經足夠。
+*/
 setInterval(fetchETA, 5000);
+setInterval(fetchWeather, 5 * 60 * 1000);
 </script>
 
 </body>
