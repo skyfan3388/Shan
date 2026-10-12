@@ -518,6 +518,69 @@ html,body{
     padding:6px 10px;
   }
 }
+
+/* ===== 新增：路線組別排序標籤 ===== */
+.group-order{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+  margin:0 2px 20px;
+}
+
+.group-order-label{
+  color:var(--muted);
+  font-size:13px;
+  font-weight:800;
+}
+
+.group-order-buttons{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+.group-order-button{
+  appearance:none;
+  border:1px solid var(--border);
+  border-radius:999px;
+  background:rgba(255,255,255,0.85);
+  color:var(--blue-dark);
+  padding:10px 16px;
+  font-family:inherit;
+  font-size:14px;
+  font-weight:850;
+  cursor:pointer;
+  transition:background 0.18s ease, box-shadow 0.18s ease;
+}
+
+.group-order-button:hover{
+  background:var(--sky);
+}
+
+.group-order-button.active{
+  background:linear-gradient(135deg,var(--orange),var(--orange-deep));
+  color:#ffffff;
+  border-color:transparent;
+  box-shadow:0 4px 12px rgba(255,143,63,0.25);
+}
+
+.group-order-button:focus-visible{
+  outline:3px solid var(--blue);
+  outline-offset:3px;
+}
+
+@media(max-width:600px){
+  .group-order{
+    gap:8px;
+    margin-bottom:16px;
+  }
+
+  .group-order-button{
+    padding:9px 13px;
+    font-size:13px;
+  }
+}
 </style>
 </head>
 
@@ -551,6 +614,33 @@ html,body{
 
 <!-- Main Panel -->
 <div class="panel">
+
+  <!-- 新增：選擇邊組路線排先；兩組都會繼續顯示 -->
+  <div class="group-order">
+    <span class="group-order-label">優先顯示：</span>
+
+    <div class="group-order-buttons" role="group" aria-label="選擇路線組別排列順序">
+      <button
+        type="button"
+        class="group-order-button active"
+        data-first-group="SO-UK"
+        aria-pressed="true"
+        onclick="setGroupOrder('SO-UK')"
+      >
+        返蘇屋邨
+      </button>
+
+      <button
+        type="button"
+        class="group-order-button"
+        data-first-group="YI-FUNG"
+        aria-pressed="false"
+        onclick="setGroupOrder('YI-FUNG')"
+      >
+        返怡峰苑
+      </button>
+    </div>
+  </div>
 
   <div class="route-group">
     <div class="section-title">返蘇屋邨</div>
@@ -1287,6 +1377,48 @@ setInterval(updateTopInfo, 1000);
 */
 setInterval(fetchETA, 5000);
 setInterval(fetchWeather, 5 * 60 * 1000);
+</script>
+
+<!-- 新增：獨立排序功能，不修改上面原有巴士代碼 -->
+<script>
+function setGroupOrder(firstGroupId){
+  if(firstGroupId !== "SO-UK" && firstGroupId !== "YI-FUNG"){
+    return;
+  }
+
+  const secondGroupId = firstGroupId === "SO-UK"
+    ? "YI-FUNG"
+    : "SO-UK";
+
+  const firstList = document.getElementById(`busList-${firstGroupId}`);
+  const secondList = document.getElementById(`busList-${secondGroupId}`);
+
+  const firstGroup = firstList?.closest(".route-group");
+  const secondGroup = secondList?.closest(".route-group");
+
+  if(!firstGroup || !secondGroup){
+    return;
+  }
+
+  const parent = firstGroup.parentElement;
+
+  if(!parent || parent !== secondGroup.parentElement){
+    return;
+  }
+
+  /*
+    只移動整個組別的位置。
+    不更改路線資料、站點選擇或 ETA 更新功能。
+  */
+  parent.insertBefore(firstGroup, secondGroup);
+
+  document.querySelectorAll(".group-order-button").forEach(button => {
+    const isActive = button.dataset.firstGroup === firstGroupId;
+
+    button.classList.toggle("active", isActive);
+    button.setAttribute("aria-pressed", String(isActive));
+  });
+}
 </script>
 
 </body>
